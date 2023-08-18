@@ -12,6 +12,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
+import com.damiandantas.daylighthabits.ui.composables.AppScreen
 import com.damiandantas.daylighthabits.ui.composables.LocationPermissionDialog
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,8 @@ class MainActivity : ComponentActivity() {
                         activityResult.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
                     })
                 }
+
+                AppScreen()
             }
         }
     }
