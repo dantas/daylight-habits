@@ -21,9 +21,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val activityResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            if (!it) finish()
-        }
+        val activityResult =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                if (!it) finish()
+            }
 
         setContent {
             val hasLocationPermission by produceState(true) {
@@ -47,6 +48,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private suspend fun hasLocationPermission() = withContext(Dispatchers.IO) {
-        ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        ContextCompat.checkSelfPermission(
+            this@MainActivity,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
     }
 }
