@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
                 value = hasLocationPermission()
             }
 
-            var showDialog by remember { mutableStateOf(hasLocationPermission) }
+            var showDialog by remember { mutableStateOf(!hasLocationPermission) }
 
             AppTheme {
                 if (showDialog) {
