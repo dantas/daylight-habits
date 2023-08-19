@@ -37,7 +37,11 @@ fun LocationPermissionDialog(onDismissDialog: () -> Unit, onClickButton: () -> U
                 null,
                 modifier = Modifier.size(160.dp)
             )
-            Text("Coarse location required", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                "Coarse location required",
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center
+            )
             Text(explanation, textAlign = TextAlign.Justify)
             Button(onClick = onClickButton) {
                 Text(button)
