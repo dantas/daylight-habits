@@ -1,7 +1,7 @@
-package com.damiandantas.daylighthabits.ui.composables
+package com.damiandantas.daylighthabits.ui.dialog
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
@@ -13,7 +13,11 @@ fun AppDialog(
     content: @Composable (paddingValues: PaddingValues) -> Unit
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
-        Surface(shape = MaterialTheme.shapes.extraLarge) {
+        Surface(
+            shape = AlertDialogDefaults.shape,
+            tonalElevation = AlertDialogDefaults.TonalElevation,
+            color = AlertDialogDefaults.containerColor,
+        ) {
             content(paddingValues = PaddingValues(24.dp))
         }
     }

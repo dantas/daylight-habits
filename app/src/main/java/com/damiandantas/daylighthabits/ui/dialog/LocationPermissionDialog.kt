@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.ui.composables
+package com.damiandantas.daylighthabits.ui.dialog
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

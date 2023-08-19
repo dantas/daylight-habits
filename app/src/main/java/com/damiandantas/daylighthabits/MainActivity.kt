@@ -12,8 +12,8 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
-import com.damiandantas.daylighthabits.ui.composables.AppScreen
-import com.damiandantas.daylighthabits.ui.composables.LocationPermissionDialog
+import com.damiandantas.daylighthabits.ui.app.AppScreen
+import com.damiandantas.daylighthabits.ui.dialog.LocationPermissionDialog
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

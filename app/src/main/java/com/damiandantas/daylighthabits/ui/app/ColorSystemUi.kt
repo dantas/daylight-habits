@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.ui.composables
+package com.damiandantas.daylighthabits.ui.app
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

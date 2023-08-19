@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.ui.composables
+package com.damiandantas.daylighthabits.ui.app
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxSize
