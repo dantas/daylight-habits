@@ -31,58 +31,64 @@ import java.time.LocalTime
 @Composable
 fun Alarm() {
     Column {
-        Card(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        ) {
-            Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
-                var enabled by rememberSaveable { mutableStateOf(false) }
-                var showSleepDurationDialog by rememberSaveable { mutableStateOf(false) }
-                var sleepDuration by rememberSaveable { mutableStateOf(LocalTime.now()) }
+        SunriseCard()
+    }
+}
 
-                LabeledTime("Sunrise time", LocalTime.of(10, 4))
+@Composable
+fun SunriseCard() {
+    Card(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
+            var enabled by rememberSaveable { mutableStateOf(false) }
+            var showSleepDurationDialog by rememberSaveable { mutableStateOf(false) }
+            var sleepDuration by rememberSaveable { mutableStateOf(LocalTime.now()) }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = "Sleep time alarm",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Switch(
-                        checked = enabled,
-                        onCheckedChange = {
-                            enabled = it
-                        })
-                }
+            LabeledTime("Sunrise time", LocalTime.of(10, 4))
 
-                if (enabled) {
-                    LabeledTime("Sleep time", sleepDuration)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Sleep time alarm",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Switch(
+                    checked = enabled,
+                    onCheckedChange = {
+                        enabled = it
+                    })
+            }
 
-                    Button(
-                        onClick = {
-                            showSleepDurationDialog = true
-                        }
-                    ) {
-                        Text("Set sleep duration")
+            if (enabled) {
+                LabeledTime("Sleep time", sleepDuration)
+
+                Button(
+                    onClick = {
+                        showSleepDurationDialog = true
                     }
+                ) {
+                    Text("Set sleep duration")
                 }
+            }
 
-                if (showSleepDurationDialog) {
-                    val dialog = TimePickerDialog(
-                        LocalContext.current,
-                        { _, hour: Int, minute: Int ->
-                            sleepDuration = LocalTime.of(hour, minute)
-                            showSleepDurationDialog = false
-                        },
-                        10, 10, true
-                    )
-                    dialog.setOnCancelListener { showSleepDurationDialog = false }
-                    dialog.show()
-                }
+            if (showSleepDurationDialog) {
+                val dialog = TimePickerDialog(
+                    LocalContext.current,
+                    { _, hour: Int, minute: Int ->
+                        sleepDuration = LocalTime.of(hour, minute)
+                        showSleepDurationDialog = false
+                    },
+                    10, 10, true
+                )
+                dialog.setOnCancelListener { showSleepDurationDialog = false }
+                dialog.show()
             }
         }
     }
