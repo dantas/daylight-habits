@@ -25,29 +25,37 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.damiandantas.daylighthabits.presentation.AlarmScreenViewModel
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import java.time.LocalTime
 
 @Composable
 fun Alarm() {
+    val viewModel: AlarmScreenViewModel = viewModel()
+
     Column {
-        SunriseCard()
+        SunriseCard(
+            sunrise = viewModel.sunrise,
+            sleepTime = viewModel.sleepTime.value,
+            onSetSleepTimeAlarm = viewModel::onSetSleepTimeAlarm,
+            onSetSleepTimeDuration = viewModel::onSetSleepTimeDuration,
+        )
     }
 }
 
 @Composable
-fun SunriseCard() {
-    Card(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-    ) {
+fun SunriseCard(
+    sunrise: LocalTime,
+    sleepTime: AlarmScreenViewModel.SleepTime,
+    onSetSleepTimeAlarm: (enabled: Boolean) -> Unit,
+    onSetSleepTimeDuration: (hour: Int, minute: Int) -> Unit
+) {
+    Card(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
         Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
-            var enabled by rememberSaveable { mutableStateOf(false) }
             var showSleepDurationDialog by rememberSaveable { mutableStateOf(false) }
-            var sleepDuration by rememberSaveable { mutableStateOf(LocalTime.now()) }
 
-            LabeledTime("Sunrise time", LocalTime.of(10, 4))
+            LabeledTime("Sunrise time", sunrise)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -60,14 +68,13 @@ fun SunriseCard() {
                     fontWeight = FontWeight.Bold
                 )
                 Switch(
-                    checked = enabled,
-                    onCheckedChange = {
-                        enabled = it
-                    })
+                    checked = sleepTime.isEnabled,
+                    onCheckedChange = onSetSleepTimeAlarm
+                )
             }
 
-            if (enabled) {
-                LabeledTime("Sleep time", sleepDuration)
+            if (sleepTime.isEnabled) {
+                LabeledTime("Sleep time", sleepTime.duration)
 
                 Button(
                     onClick = {
@@ -82,10 +89,10 @@ fun SunriseCard() {
                 val dialog = TimePickerDialog(
                     LocalContext.current,
                     { _, hour: Int, minute: Int ->
-                        sleepDuration = LocalTime.of(hour, minute)
+                        onSetSleepTimeDuration(hour, minute)
                         showSleepDurationDialog = false
                     },
-                    10, 10, true
+                    sleepTime.duration.hour, sleepTime.duration.minute, true
                 )
                 dialog.setOnCancelListener { showSleepDurationDialog = false }
                 dialog.show()
@@ -104,20 +111,22 @@ fun LabeledTime(title: String, time: LocalTime) {
             modifier = Modifier.align(Alignment.Start)
         )
         Text(
-            text = time.timeString,
+            text = String.format("%02d:%02d", time.hour, time.minute),
             fontSize = 48.sp,
             modifier = Modifier.align(Alignment.End)
         )
     }
 }
 
-val LocalTime.timeString: String
-    get() = String.format("%02d:%02d", hour, minute)
-
 @Preview
 @Composable
-fun AlarmPreview() {
+fun SunriseCardPreview() {
     AppTheme {
-        Alarm()
+        SunriseCard(
+            sunrise = LocalTime.now(),
+            sleepTime = AlarmScreenViewModel.SleepTime(true, LocalTime.of(14, 23)),
+            onSetSleepTimeAlarm = {},
+            onSetSleepTimeDuration = { _, _ -> },
+        )
     }
 }
