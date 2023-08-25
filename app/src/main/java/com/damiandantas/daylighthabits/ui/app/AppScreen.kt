@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.damiandantas.daylighthabits.ui.screen.Alarm
+import com.damiandantas.daylighthabits.ui.screen.AlarmScreen
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 
 private const val ALARM = "alarm"
@@ -47,7 +47,7 @@ fun AppScreen() {
                 modifier = Modifier.padding(paddingValues)
             ) {
                 composable(ALARM) {
-                    Alarm()
+                    AlarmScreen()
                 }
                 composable(FORECAST) {
                     Text(text = "Forecast")

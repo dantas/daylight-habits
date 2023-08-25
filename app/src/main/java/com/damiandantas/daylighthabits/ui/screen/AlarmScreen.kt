@@ -31,7 +31,7 @@ import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import java.time.LocalTime
 
 @Composable
-fun Alarm() {
+fun AlarmScreen() {
     val viewModel: AlarmScreenViewModel = viewModel()
 
     Column {
@@ -51,7 +51,9 @@ fun SunriseCard(
     onSetSleepTimeAlarm: (enabled: Boolean) -> Unit,
     onSetSleepTimeDuration: (hour: Int, minute: Int) -> Unit
 ) {
-    Card(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+    Card(modifier = Modifier
+        .padding(16.dp)
+        .fillMaxWidth()) {
         Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
             var showSleepDurationDialog by rememberSaveable { mutableStateOf(false) }
 
