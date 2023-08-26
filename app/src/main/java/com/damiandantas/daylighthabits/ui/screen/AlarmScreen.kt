@@ -3,6 +3,7 @@
 package com.damiandantas.daylighthabits.ui.screen
 
 import android.app.TimePickerDialog
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,16 +17,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.presentation.AlarmScreenViewModel
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import java.time.LocalTime
@@ -45,19 +49,67 @@ fun AlarmScreen() {
 }
 
 @Composable
-fun SunriseCard(
+private fun SunriseCard(
     sunrise: LocalTime,
     sleepTime: AlarmScreenViewModel.SleepTime,
     onSetSleepTimeAlarm: (enabled: Boolean) -> Unit,
     onSetSleepTimeDuration: (hour: Int, minute: Int) -> Unit
 ) {
-    Card(modifier = Modifier
-        .padding(16.dp)
-        .fillMaxWidth()) {
+    val cardResources = remember {
+        AlarmScreenRes(
+            sunriseTime = R.string.sunrise_time,
+            sleepTimeAlarm = R.string.sleep_time_alarm,
+            sleepTime = R.string.sleep_time,
+            setSleepTimeDuration = R.string.set_sleep_time_duration
+        )
+    }
+
+    AlarmScreenCard(
+        time = sunrise,
+        cardResources = cardResources,
+        sleepTime = sleepTime,
+        onSetSleepTimeAlarm = onSetSleepTimeAlarm,
+        onSetSleepTimeDuration = onSetSleepTimeDuration
+    )
+}
+
+@Preview
+@Composable
+private fun SunriseCardPreview() {
+    AppTheme {
+        SunriseCard(
+            sunrise = LocalTime.now(),
+            sleepTime = AlarmScreenViewModel.SleepTime(true, LocalTime.of(14, 23)),
+            onSetSleepTimeAlarm = {},
+            onSetSleepTimeDuration = { _, _ -> },
+        )
+    }
+}
+
+private data class AlarmScreenRes(
+    @StringRes val sunriseTime: Int,
+    @StringRes val sleepTimeAlarm: Int,
+    @StringRes val sleepTime: Int,
+    @StringRes val setSleepTimeDuration: Int,
+)
+
+@Composable
+private fun AlarmScreenCard(
+    time: LocalTime,
+    cardResources: AlarmScreenRes,
+    sleepTime: AlarmScreenViewModel.SleepTime,
+    onSetSleepTimeAlarm: (enabled: Boolean) -> Unit,
+    onSetSleepTimeDuration: (hour: Int, minute: Int) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) {
         Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
             var showSleepDurationDialog by rememberSaveable { mutableStateOf(false) }
 
-            LabeledTime("Sunrise time", sunrise)
+            LabeledTime(stringResource(cardResources.sunriseTime), time)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -65,7 +117,7 @@ fun SunriseCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Sleep time alarm",
+                    text = stringResource(cardResources.sleepTimeAlarm),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -76,14 +128,14 @@ fun SunriseCard(
             }
 
             if (sleepTime.isEnabled) {
-                LabeledTime("Sleep time", sleepTime.duration)
+                LabeledTime(stringResource(cardResources.sleepTime), sleepTime.duration)
 
                 Button(
                     onClick = {
                         showSleepDurationDialog = true
                     }
                 ) {
-                    Text("Set sleep duration")
+                    Text(stringResource(cardResources.setSleepTimeDuration))
                 }
             }
 
@@ -104,7 +156,7 @@ fun SunriseCard(
 }
 
 @Composable
-fun LabeledTime(title: String, time: LocalTime) {
+private fun LabeledTime(title: String, time: LocalTime) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
@@ -116,19 +168,6 @@ fun LabeledTime(title: String, time: LocalTime) {
             text = String.format("%02d:%02d", time.hour, time.minute),
             fontSize = 48.sp,
             modifier = Modifier.align(Alignment.End)
-        )
-    }
-}
-
-@Preview
-@Composable
-fun SunriseCardPreview() {
-    AppTheme {
-        SunriseCard(
-            sunrise = LocalTime.now(),
-            sleepTime = AlarmScreenViewModel.SleepTime(true, LocalTime.of(14, 23)),
-            onSetSleepTimeAlarm = {},
-            onSetSleepTimeDuration = { _, _ -> },
         )
     }
 }

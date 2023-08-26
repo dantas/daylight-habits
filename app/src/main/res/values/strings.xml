@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Daylight Habits</string>
+    <string name="sunrise_time">Sunrise time</string>
+    <string name="sleep_time_alarm">Sleep time alarm</string>
+    <string name="sleep_time">Sleep time</string>
+    <string name="set_sleep_time_duration">Set sleep duration</string>
 </resources>
