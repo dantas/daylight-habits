@@ -3,29 +3,28 @@ package com.damiandantas.daylighthabits.presentation
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.damiandantas.daylighthabits.domain.SunTime
 import java.time.LocalTime
 import java.time.ZonedDateTime
 
 class AlarmScreenViewModel : ViewModel() {
-    // Use Duration?
-    data class Alarm(val isEnabled: Boolean, val duration: LocalTime)
+    data class Event(
+        val time: ZonedDateTime,
+        val notificationEnabled: Boolean,
+        val notificationDuration: LocalTime  // Use Duration?
+    )
 
-    private val _sunriseAlarm = mutableStateOf(Alarm(false, LocalTime.now()))
-    val sunriseAlarm: State<Alarm> = _sunriseAlarm
+    private val _sunriseEvent = mutableStateOf(Event(ZonedDateTime.now(), false, LocalTime.now()))
+    val sunriseEvent: State<Event> = _sunriseEvent
 
-    private val _sunsetAlarm = mutableStateOf(Alarm(false, LocalTime.now()))
-    val sunsetAlarm: State<Alarm> = _sunriseAlarm
-
-    private val _sunTime = mutableStateOf(SunTime(ZonedDateTime.now(), ZonedDateTime.now()))
-    var sunTime: State<SunTime> = _sunTime
+    private val _sunsetEvent = mutableStateOf(Event(ZonedDateTime.now(), false, LocalTime.now()))
+    val sunsetEvent: State<Event> = _sunsetEvent
 
     fun onSetSunriseAlarm(enabled: Boolean) {
-
+        _sunriseEvent.value = _sunriseEvent.value.copy(notificationEnabled = enabled)
     }
 
     fun onSetSunsetAlarm(enabled: Boolean) {
-
+        _sunsetEvent.value = _sunsetEvent.value.copy(notificationEnabled = enabled)
     }
 
     fun onSetSunriseAlarmDuration(hour: Int, minute: Int) {
