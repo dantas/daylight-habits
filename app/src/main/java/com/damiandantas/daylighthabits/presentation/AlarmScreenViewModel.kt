@@ -1,29 +1,38 @@
 package com.damiandantas.daylighthabits.presentation
 
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.damiandantas.daylighthabits.domain.SunTime
 import java.time.LocalTime
+import java.time.ZonedDateTime
 
 class AlarmScreenViewModel : ViewModel() {
-    data class SleepTime(val isEnabled: Boolean, val duration: LocalTime)
+    // Use Duration?
+    data class Alarm(val isEnabled: Boolean, val duration: LocalTime)
 
-    private val _sleepTime = mutableStateOf(SleepTime(false, LocalTime.now()))
-    val sleepTime: androidx.compose.runtime.State<SleepTime> = _sleepTime
+    private val _sunriseAlarm = mutableStateOf(Alarm(false, LocalTime.now()))
+    val sunriseAlarm: State<Alarm> = _sunriseAlarm
 
-    var sunrise: LocalTime by mutableStateOf(LocalTime.now())
-        private set
+    private val _sunsetAlarm = mutableStateOf(Alarm(false, LocalTime.now()))
+    val sunsetAlarm: State<Alarm> = _sunriseAlarm
 
-    init {
-        sunrise = LocalTime.now()
+    private val _sunTime = mutableStateOf(SunTime(ZonedDateTime.now(), ZonedDateTime.now()))
+    var sunTime: State<SunTime> = _sunTime
+
+    fun onSetSunriseAlarm(enabled: Boolean) {
+
     }
 
-    fun onSetSleepTimeAlarm(enabled: Boolean) {
-        _sleepTime.value = _sleepTime.value.copy(isEnabled = enabled)
+    fun onSetSunsetAlarm(enabled: Boolean) {
+
     }
 
-    fun onSetSleepTimeDuration(hour: Int, minute: Int) {
-        _sleepTime.value = _sleepTime.value.copy(duration = LocalTime.of(hour, minute))
+    fun onSetSunriseAlarmDuration(hour: Int, minute: Int) {
+
+    }
+
+    fun onSetSunsetAlarmDuration(hour: Int, minute: Int) {
+
     }
 }
