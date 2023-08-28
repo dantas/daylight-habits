@@ -32,7 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.presentation.AlarmScreenViewModel
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
-import java.time.LocalTime
+import java.time.Duration
 import java.time.ZonedDateTime
 
 @Composable
@@ -54,8 +54,8 @@ fun AlarmScreen() {
 fun AlarmScreenPreview() {
     AppTheme {
         AlarmScreenContent(
-            sunrise = AlarmScreenViewModel.Event(ZonedDateTime.now(), true, LocalTime.now()),
-            sunset = AlarmScreenViewModel.Event(ZonedDateTime.now(), true, LocalTime.now()),
+            sunrise = AlarmScreenViewModel.Event(ZonedDateTime.now(), true, Duration.ZERO),
+            sunset = AlarmScreenViewModel.Event(ZonedDateTime.now(), true, Duration.ZERO),
             onSetSunriseAlarm = {},
             onSetSunriseAlarmDuration = { _, _ -> },
             onSetSunsetAlarm = {},
@@ -119,7 +119,11 @@ private fun AlarmScreenCard(
         Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
             var showSleepDurationDialog by rememberSaveable { mutableStateOf(false) }
 
-            LabeledTime(stringResource(cardResources.sunriseTime), event.time.toLocalTime())
+            LabeledTime(
+                title = stringResource(cardResources.sunriseTime),
+                hour = event.time.hour,
+                minute = event.time.minute
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -138,7 +142,11 @@ private fun AlarmScreenCard(
             }
 
             if (event.notificationEnabled) {
-                LabeledTime(stringResource(cardResources.sleepTime), event.notificationDuration)
+                LabeledTime(
+                    title = stringResource(cardResources.sleepTime),
+                    hour = event.notificationDuration.hours,
+                    minute = event.notificationDuration.minutes
+                )
 
                 Button(
                     onClick = {
@@ -156,7 +164,9 @@ private fun AlarmScreenCard(
                         onSetAlarmDuration(hour, minute)
                         showSleepDurationDialog = false
                     },
-                    event.notificationDuration.hour, event.notificationDuration.minute, true
+                    event.notificationDuration.hours,
+                    event.notificationDuration.minutes,
+                    true
                 )
                 dialog.setOnCancelListener { showSleepDurationDialog = false }
                 dialog.show()
@@ -164,6 +174,12 @@ private fun AlarmScreenCard(
         }
     }
 }
+
+private val Duration.hours
+    get() = toHours().toInt()
+
+private val Duration.minutes
+    get() = (toMinutes() % 60).toInt()
 
 private data class AlarmScreenRes(
     @StringRes val sunriseTime: Int,
@@ -173,7 +189,7 @@ private data class AlarmScreenRes(
 )
 
 @Composable
-private fun LabeledTime(title: String, time: LocalTime) {
+private fun LabeledTime(title: String, hour: Int, minute: Int) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
@@ -182,7 +198,7 @@ private fun LabeledTime(title: String, time: LocalTime) {
             modifier = Modifier.align(Alignment.Start)
         )
         Text(
-            text = String.format("%02d:%02d", time.hour, time.minute),
+            text = String.format("%02d:%02d", hour, minute),
             fontSize = 48.sp,
             modifier = Modifier.align(Alignment.End)
         )
