@@ -77,10 +77,10 @@ private fun AlarmScreenContent(
         AlarmScreenCard(
             cardResources = remember {
                 AlarmScreenRes(
-                    sunriseTime = R.string.sunrise_time,
-                    sleepTimeAlarm = R.string.sleep_time_alarm,
-                    sleepTime = R.string.sleep_time,
-                    setSleepTimeDuration = R.string.set_sleep_time_duration
+                    sunriseTime = R.string.sunrise_card_time,
+                    sleepTimeAlarm = R.string.sunrise_card_alarm,
+                    sleepTime = R.string.sunrise_card_alarm_time,
+                    setSleepTimeDuration = R.string.sunrise_card_set_duration
                 )
             },
             event = sunrise,
@@ -92,9 +92,9 @@ private fun AlarmScreenContent(
             cardResources = remember {
                 AlarmScreenRes(
                     sunriseTime = R.string.sunset_card_time,
-                    sleepTimeAlarm = R.string.sunset_card_enable_alarm,
+                    sleepTimeAlarm = R.string.sunset_card_alarm,
                     sleepTime = R.string.sunset_card_alarm_time,
-                    setSleepTimeDuration = R.string.set_sleep_time_duration
+                    setSleepTimeDuration = R.string.sunset_card_set_duration
                 )
             },
             event = sunset,

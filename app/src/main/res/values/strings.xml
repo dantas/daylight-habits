@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">Daylight Habits</string>
-    <string name="sunrise_time">Sunrise time</string>
-    <string name="sleep_time_alarm">Sleep time alarm</string>
-    <string name="sleep_time">Sleep time</string>
-    <string name="set_sleep_time_duration">Set sleep duration</string>
+    <string name="sunrise_card_time">Sunrise time</string>
+    <string name="sunrise_card_alarm">Sleep time alarm</string>
+    <string name="sunrise_card_alarm_time">Sleep time</string>
+    <string name="sunrise_card_set_duration">Set sleep duration</string>
     <string name="sunset_card_time">Sunset time</string>
-    <string name="sunset_card_enable_alarm">Go outside alarm</string>
+    <string name="sunset_card_alarm">Go outside alarm</string>
     <string name="sunset_card_alarm_time">Go outside at</string>
-    <string name="sunset_card_">Go outside at</string>
+    <string name="sunset_card_set_duration">Go outside at</string>
 </resources>
