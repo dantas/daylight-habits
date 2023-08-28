@@ -122,9 +122,9 @@ private fun AlarmScreenCard(
     onSetAlarm: (enabled: Boolean) -> Unit,
     onSetAlarmDuration: (hour: Int, minute: Int) -> Unit
 ) {
-    Card(
+    ElevatedCard(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
             .fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
