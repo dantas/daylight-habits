@@ -77,28 +77,17 @@ private fun AlarmScreenContent(
     onSetSunsetAlarm: (Boolean) -> Unit,
     onSetSunsetAlarmDuration: (hour: Int, minute: Int) -> Unit,
 ) {
-    val sunriseCardRes = remember {
-        AlarmScreenRes(
-            sunriseTime = R.string.sunrise_time,
-            sleepTimeAlarm = R.string.sleep_time_alarm,
-            sleepTime = R.string.sleep_time,
-            setSleepTimeDuration = R.string.set_sleep_time_duration
-        )
-    }
-
-    val sunsetCardRes = remember {
-        AlarmScreenRes(
-            sunriseTime = R.string.sunset_card_time,
-            sleepTimeAlarm = R.string.sunset_card_enable_alarm,
-            sleepTime = R.string.sunset_card_alarm_time,
-            setSleepTimeDuration = R.string.set_sleep_time_duration
-        )
-    }
-
     Column(verticalArrangement = Arrangement.Top) {
         AlarmScreenCard(
             time = suntime.sunrise.toLocalTime(),
-            cardResources = sunriseCardRes,
+            cardResources = remember {
+                AlarmScreenRes(
+                    sunriseTime = R.string.sunrise_time,
+                    sleepTimeAlarm = R.string.sleep_time_alarm,
+                    sleepTime = R.string.sleep_time,
+                    setSleepTimeDuration = R.string.set_sleep_time_duration
+                )
+            },
             alarm = sunriseAlarm,
             onSetAlarm = onSetSunriseAlarm,
             onSetAlarmDuration = onSetSunriseAlarmDuration
@@ -106,7 +95,14 @@ private fun AlarmScreenContent(
 
         AlarmScreenCard(
             time = suntime.sunset.toLocalTime(),
-            cardResources = sunsetCardRes,
+            cardResources = remember {
+                AlarmScreenRes(
+                    sunriseTime = R.string.sunset_card_time,
+                    sleepTimeAlarm = R.string.sunset_card_enable_alarm,
+                    sleepTime = R.string.sunset_card_alarm_time,
+                    setSleepTimeDuration = R.string.set_sleep_time_duration
+                )
+            },
             alarm = sunsetAlarm,
             onSetAlarm = onSetSunsetAlarm,
             onSetAlarmDuration = onSetSunsetAlarmDuration
