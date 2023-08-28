@@ -30,68 +30,54 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.damiandantas.daylighthabits.R
+import com.damiandantas.daylighthabits.domain.SunTime
 import com.damiandantas.daylighthabits.presentation.AlarmScreenViewModel
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import java.time.LocalTime
+import java.time.ZonedDateTime
 
 @Composable
 fun AlarmScreen() {
     val viewModel: AlarmScreenViewModel = viewModel()
 
-    AlarmScreenLayout {
-        SunriseCard(
-            sunrise = viewModel.sunTime.value.sunrise.toLocalTime(),
-            alarm = viewModel.sunriseAlarm.value,
-            onEnableAlarm = viewModel::onSetSunriseAlarm,
-            onSetAlarmDuration = viewModel::onSetSunriseAlarmDuration,
-        )
-
-        SunsetCard(
-            sunset = viewModel.sunTime.value.sunset.toLocalTime(),
-            alarm = viewModel.sunsetAlarm.value,
-            onEnableAlarm = viewModel::onSetSunsetAlarm,
-            onSetAlarmDuration = viewModel::onSetSunsetAlarmDuration,
-        )
-    }
+    AlarmScreenContent(
+        suntime = viewModel.sunTime.value,
+        sunriseAlarm = viewModel.sunriseAlarm.value,
+        sunsetAlarm = viewModel.sunsetAlarm.value,
+        onSetSunriseAlarm = viewModel::onSetSunriseAlarm,
+        onSetSunriseAlarmDuration = viewModel::onSetSunriseAlarmDuration,
+        onSetSunsetAlarm = viewModel::onSetSunsetAlarm,
+        onSetSunsetAlarmDuration = viewModel::onSetSunsetAlarmDuration,
+    )
 }
 
 @Composable
 @Preview(showSystemUi = true)
 fun AlarmScreenPreview() {
     AppTheme {
-        AlarmScreenLayout {
-            SunriseCard(
-                sunrise = LocalTime.now(),
-                alarm = AlarmScreenViewModel.Alarm(true, LocalTime.of(14, 23)),
-                onEnableAlarm = {},
-                onSetAlarmDuration = { _, _ -> },
-            )
-
-            SunsetCard(
-                sunset = LocalTime.of(17, 15),
-                alarm = AlarmScreenViewModel.Alarm(true, LocalTime.of(17, 0)),
-                onEnableAlarm = {},
-                onSetAlarmDuration = { _, _ -> },
-            )
-        }
+        AlarmScreenContent(
+            suntime = SunTime(ZonedDateTime.now(), ZonedDateTime.now()),
+            sunriseAlarm = AlarmScreenViewModel.Alarm(true, LocalTime.now()),
+            sunsetAlarm = AlarmScreenViewModel.Alarm(true, LocalTime.now()),
+            onSetSunriseAlarm = {},
+            onSetSunriseAlarmDuration = {_, _ -> },
+            onSetSunsetAlarm = {},
+            onSetSunsetAlarmDuration = {_, _ -> },
+        )
     }
 }
 
 @Composable
-private fun AlarmScreenLayout(content: @Composable () -> Unit) {
-    Column(verticalArrangement = Arrangement.Top) {
-        content()
-    }
-}
-
-@Composable
-private fun SunriseCard(
-    sunrise: LocalTime,
-    alarm: AlarmScreenViewModel.Alarm,
-    onEnableAlarm: (enabled: Boolean) -> Unit,
-    onSetAlarmDuration: (hour: Int, minute: Int) -> Unit
+private fun AlarmScreenContent(
+    suntime: SunTime,
+    sunriseAlarm: AlarmScreenViewModel.Alarm,
+    sunsetAlarm: AlarmScreenViewModel.Alarm,
+    onSetSunriseAlarm: (Boolean) -> Unit,
+    onSetSunriseAlarmDuration: (hour: Int, minute: Int) -> Unit,
+    onSetSunsetAlarm: (Boolean) -> Unit,
+    onSetSunsetAlarmDuration: (hour: Int, minute: Int) -> Unit,
 ) {
-    val cardResources = remember {
+    val sunriseCardRes = remember {
         AlarmScreenRes(
             sunriseTime = R.string.sunrise_time,
             sleepTimeAlarm = R.string.sleep_time_alarm,
@@ -100,23 +86,7 @@ private fun SunriseCard(
         )
     }
 
-    AlarmScreenCard(
-        time = sunrise,
-        cardResources = cardResources,
-        alarm = alarm,
-        onEnableAlarm = onEnableAlarm,
-        onSetAlarmDuration = onSetAlarmDuration
-    )
-}
-
-@Composable
-private fun SunsetCard(
-    sunset: LocalTime,
-    alarm: AlarmScreenViewModel.Alarm,
-    onEnableAlarm: (enabled: Boolean) -> Unit,
-    onSetAlarmDuration: (hour: Int, minute: Int) -> Unit
-) {
-    val cardResources = remember {
+    val sunsetCardRes = remember {
         AlarmScreenRes(
             sunriseTime = R.string.sunset_card_time,
             sleepTimeAlarm = R.string.sunset_card_enable_alarm,
@@ -125,28 +95,31 @@ private fun SunsetCard(
         )
     }
 
-    AlarmScreenCard(
-        time = sunset,
-        cardResources = cardResources,
-        alarm = alarm,
-        onEnableAlarm = onEnableAlarm,
-        onSetAlarmDuration = onSetAlarmDuration
-    )
-}
+    Column(verticalArrangement = Arrangement.Top) {
+        AlarmScreenCard(
+            time = suntime.sunrise.toLocalTime(),
+            cardResources = sunriseCardRes,
+            alarm = sunriseAlarm,
+            onSetAlarm = onSetSunriseAlarm,
+            onSetAlarmDuration = onSetSunriseAlarmDuration
+        )
 
-private data class AlarmScreenRes(
-    @StringRes val sunriseTime: Int,
-    @StringRes val sleepTimeAlarm: Int,
-    @StringRes val sleepTime: Int,
-    @StringRes val setSleepTimeDuration: Int,
-)
+        AlarmScreenCard(
+            time = suntime.sunset.toLocalTime(),
+            cardResources = sunsetCardRes,
+            alarm = sunsetAlarm,
+            onSetAlarm = onSetSunsetAlarm,
+            onSetAlarmDuration = onSetSunsetAlarmDuration
+        )
+    }
+}
 
 @Composable
 private fun AlarmScreenCard(
     time: LocalTime,
     cardResources: AlarmScreenRes,
     alarm: AlarmScreenViewModel.Alarm,
-    onEnableAlarm: (enabled: Boolean) -> Unit,
+    onSetAlarm: (enabled: Boolean) -> Unit,
     onSetAlarmDuration: (hour: Int, minute: Int) -> Unit
 ) {
     Card(
@@ -171,7 +144,7 @@ private fun AlarmScreenCard(
                 )
                 Switch(
                     checked = alarm.isEnabled,
-                    onCheckedChange = onEnableAlarm
+                    onCheckedChange = onSetAlarm
                 )
             }
 
@@ -202,6 +175,13 @@ private fun AlarmScreenCard(
         }
     }
 }
+
+private data class AlarmScreenRes(
+    @StringRes val sunriseTime: Int,
+    @StringRes val sleepTimeAlarm: Int,
+    @StringRes val sleepTime: Int,
+    @StringRes val setSleepTimeDuration: Int,
+)
 
 @Composable
 private fun LabeledTime(title: String, time: LocalTime) {
