@@ -9,14 +9,17 @@ import java.time.ZonedDateTime
 class AlarmScreenViewModel : ViewModel() {
     data class Event(
         val time: ZonedDateTime,
+        val notificationTime: ZonedDateTime,
         val notificationEnabled: Boolean,
         val notificationDuration: Duration
     )
 
-    private val _sunriseEvent = mutableStateOf(Event(ZonedDateTime.now(), false, Duration.ZERO))
+    private val _sunriseEvent =
+        mutableStateOf(Event(ZonedDateTime.now(), ZonedDateTime.now(), false, Duration.ZERO))
     val sunriseEvent: State<Event> = _sunriseEvent
 
-    private val _sunsetEvent = mutableStateOf(Event(ZonedDateTime.now(), false, Duration.ZERO))
+    private val _sunsetEvent =
+        mutableStateOf(Event(ZonedDateTime.now(), ZonedDateTime.now(), false, Duration.ZERO))
     val sunsetEvent: State<Event> = _sunsetEvent
 
     fun onSetSunriseAlarm(enabled: Boolean) {

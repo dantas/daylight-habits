@@ -4,15 +4,16 @@ package com.damiandantas.daylighthabits.ui.screen
 
 import android.app.TimePickerDialog
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Switch
+import androidx.compose.material3.FilledIconToggleButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,11 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.presentation.AlarmScreenViewModel
@@ -54,8 +55,18 @@ fun AlarmScreen() {
 fun AlarmScreenPreview() {
     AppTheme {
         AlarmScreenContent(
-            sunrise = AlarmScreenViewModel.Event(ZonedDateTime.now(), true, Duration.ZERO),
-            sunset = AlarmScreenViewModel.Event(ZonedDateTime.now(), true, Duration.ZERO),
+            sunrise = AlarmScreenViewModel.Event(
+                ZonedDateTime.now(),
+                ZonedDateTime.now().minusHours(8),
+                true,
+                Duration.ofHours(8)
+            ),
+            sunset = AlarmScreenViewModel.Event(
+                ZonedDateTime.now(),
+                ZonedDateTime.now().minusMinutes(15),
+                true,
+                Duration.ofMinutes(15)
+            ),
             onSetSunriseAlarm = {},
             onSetSunriseAlarmDuration = { _, _ -> },
             onSetSunsetAlarm = {},
@@ -73,14 +84,15 @@ private fun AlarmScreenContent(
     onSetSunsetAlarm: (Boolean) -> Unit,
     onSetSunsetAlarmDuration: (hour: Int, minute: Int) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.Top) {
+    Column {
         AlarmScreenCard(
             cardResources = remember {
                 AlarmScreenRes(
-                    sunriseTime = R.string.sunrise_card_time,
-                    sleepTimeAlarm = R.string.sunrise_card_alarm,
-                    sleepTime = R.string.sunrise_card_alarm_time,
-                    setSleepTimeDuration = R.string.sunrise_card_set_duration
+                    title = R.string.sunrise_card_title,
+                    event = R.string.sunrise_card_event,
+                    alarm = R.string.sunrise_card_alarm,
+                    duration = R.string.sunrise_card_duration,
+                    setDuration = R.string.sunrise_card_set_duration
                 )
             },
             event = sunrise,
@@ -91,10 +103,11 @@ private fun AlarmScreenContent(
         AlarmScreenCard(
             cardResources = remember {
                 AlarmScreenRes(
-                    sunriseTime = R.string.sunset_card_time,
-                    sleepTimeAlarm = R.string.sunset_card_alarm,
-                    sleepTime = R.string.sunset_card_alarm_time,
-                    setSleepTimeDuration = R.string.sunset_card_set_duration
+                    title = R.string.sunset_card_title,
+                    event = R.string.sunset_card_event,
+                    alarm = R.string.sunset_card_alarm,
+                    duration = R.string.sunset_card_duration,
+                    setDuration = R.string.sunset_card_set_duration
                 )
             },
             event = sunset,
@@ -112,68 +125,83 @@ private fun AlarmScreenCard(
     onSetAlarmDuration: (hour: Int, minute: Int) -> Unit
 ) {
     ElevatedCard(
-        modifier = Modifier
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-            .fillMaxWidth()
+        modifier = Modifier.padding(top = cardMargin, start = cardMargin, end = cardMargin)
     ) {
-        Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
-            var showSleepDurationDialog by rememberSaveable { mutableStateOf(false) }
+        var showSleepDurationDialog by rememberSaveable { mutableStateOf(false) }
 
-            LabeledTime(
-                title = stringResource(cardResources.sunriseTime),
-                hour = event.time.hour,
-                minute = event.time.minute
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(all = cardPadding)
+        ) {
+            FilledIconToggleButton(
+                checked = event.notificationEnabled,
+                onCheckedChange = onSetAlarm,
+                modifier = Modifier.align(Alignment.CenterEnd)
             ) {
-                Text(
-                    text = stringResource(cardResources.sleepTimeAlarm),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Switch(
-                    checked = event.notificationEnabled,
-                    onCheckedChange = onSetAlarm
-                )
+                val icon =
+                    if (event.notificationEnabled) R.drawable.alarm_on else R.drawable.alarm_off
+                Icon(painterResource(id = icon), null)
             }
 
-            if (event.notificationEnabled) {
+            Column(
+                modifier = Modifier.align(Alignment.TopStart)
+            ) {
                 LabeledTime(
-                    title = stringResource(cardResources.sleepTime),
-                    hour = event.notificationDuration.hours,
-                    minute = event.notificationDuration.minutes
+                    title = stringResource(cardResources.event),
+                    hour = event.time.hour,
+                    minute = event.time.minute
                 )
 
-                Button(
-                    onClick = {
-                        showSleepDurationDialog = true
+                if (event.notificationEnabled) {
+                    LabeledTime(
+                        title = stringResource(cardResources.alarm),
+                        hour = event.notificationTime.hour,
+                        minute = event.notificationTime.minute,
+                        modifier = Modifier.padding(top = cardPadding)
+                    )
+
+                    LabeledTime(
+                        title = stringResource(cardResources.duration),
+                        hour = event.notificationDuration.hours,
+                        minute = event.notificationDuration.minutes,
+                        modifier = Modifier.padding(top = cardPadding)
+                    )
+
+                    Button(
+                        onClick = {
+                            showSleepDurationDialog = true
+                        },
+                        modifier = Modifier.padding(top = cardPadding)
+                    ) {
+                        Text(stringResource(cardResources.setDuration))
                     }
-                ) {
-                    Text(stringResource(cardResources.setSleepTimeDuration))
                 }
-            }
 
-            if (showSleepDurationDialog) {
-                val dialog = TimePickerDialog(
-                    LocalContext.current,
-                    { _, hour: Int, minute: Int ->
-                        onSetAlarmDuration(hour, minute)
-                        showSleepDurationDialog = false
-                    },
-                    event.notificationDuration.hours,
-                    event.notificationDuration.minutes,
-                    true
-                )
-                dialog.setOnCancelListener { showSleepDurationDialog = false }
-                dialog.show()
+                if (showSleepDurationDialog) {
+                    val dialog = TimePickerDialog(
+                        LocalContext.current,
+                        { _, hour: Int, minute: Int ->
+                            onSetAlarmDuration(hour, minute)
+                            showSleepDurationDialog = false
+                        },
+                        event.notificationDuration.hours,
+                        event.notificationDuration.minutes,
+                        true
+                    )
+                    dialog.setOnCancelListener { showSleepDurationDialog = false }
+                    dialog.show()
+                }
             }
         }
     }
 }
+
+private val cardMargin = 16.dp
+private val cardPadding = 10.dp
+
+private inline val titleStyle: TextStyle
+    @Composable get() = MaterialTheme.typography.titleLarge
 
 private val Duration.hours
     get() = toHours().toInt()
@@ -182,25 +210,23 @@ private val Duration.minutes
     get() = (toMinutes() % 60).toInt()
 
 private data class AlarmScreenRes(
-    @StringRes val sunriseTime: Int,
-    @StringRes val sleepTimeAlarm: Int,
-    @StringRes val sleepTime: Int,
-    @StringRes val setSleepTimeDuration: Int,
+    @StringRes val title: Int,
+    @StringRes val event: Int,
+    @StringRes val alarm: Int,
+    @StringRes val duration: Int,
+    @StringRes val setDuration: Int,
 )
 
 @Composable
-private fun LabeledTime(title: String, hour: Int, minute: Int) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+private fun LabeledTime(title: String, hour: Int, minute: Int, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
         Text(
             text = title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.Start)
+            style = titleStyle,
         )
         Text(
             text = String.format("%02d:%02d", hour, minute),
-            fontSize = 48.sp,
-            modifier = Modifier.align(Alignment.End)
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }
