@@ -2,8 +2,9 @@ package com.damiandantas.daylighthabits.domain
 
 import java.time.Duration
 import java.time.ZonedDateTime
+import javax.inject.Inject
 
-class SunsetAlarm {
+class SunsetAlarm @Inject constructor() {
     private var isEnabled = false
     private var sleepDuration = Duration.ofMinutes(15)
 

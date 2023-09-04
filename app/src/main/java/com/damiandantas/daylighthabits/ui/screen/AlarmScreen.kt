@@ -29,7 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.presentation.AlarmScreenViewModel
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
@@ -38,7 +38,7 @@ import java.time.ZonedDateTime
 
 @Composable
 fun AlarmScreen() {
-    val viewModel: AlarmScreenViewModel = viewModel()
+    val viewModel: AlarmScreenViewModel = hiltViewModel()
 
     AlarmScreenContent(
         sunriseAlarm = viewModel.sunriseAlarmState.value,
