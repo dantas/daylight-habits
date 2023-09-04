@@ -2,13 +2,13 @@
     <string name="app_name">Daylight Habits</string>
 
     <string name="sunrise_card_title">Sunrise</string>
-    <string name="sunrise_card_event">Sunrise time</string>
+    <string name="sunrise_card_sun_time">Sunrise time</string>
     <string name="sunrise_card_alarm">Sleep time</string>
     <string name="sunrise_card_duration">Hours of sleep</string>
     <string name="sunrise_card_set_duration">Set sleep duration</string>
 
     <string name="sunset_card_title">Sunset</string>
-    <string name="sunset_card_event">Sunset time</string>
+    <string name="sunset_card_sun_time">Sunset time</string>
     <string name="sunset_card_alarm">Go outside at</string>
     <string name="sunset_card_duration">Heads-up time</string>
     <string name="sunset_card_set_duration">Set heads-up time</string>

@@ -3,38 +3,69 @@ package com.damiandantas.daylighthabits.presentation
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.damiandantas.daylighthabits.domain.SunriseAlarm
+import com.damiandantas.daylighthabits.domain.SunsetAlarm
 import java.time.Duration
 import java.time.ZonedDateTime
 
 class AlarmScreenViewModel : ViewModel() {
-    data class Event(
+    data class SunAlarm(
         val time: ZonedDateTime,
         val notificationTime: ZonedDateTime,
         val notificationEnabled: Boolean,
         val notificationDuration: Duration
     )
 
-    private val _sunriseEvent =
-        mutableStateOf(Event(ZonedDateTime.now(), ZonedDateTime.now(), false, Duration.ZERO))
-    val sunriseEvent: State<Event> = _sunriseEvent
+    private val _sunriseAlarmState =
+        mutableStateOf(SunAlarm(ZonedDateTime.now(), ZonedDateTime.now(), false, Duration.ZERO))
+    val sunriseAlarmState: State<SunAlarm> = _sunriseAlarmState
 
-    private val _sunsetEvent =
-        mutableStateOf(Event(ZonedDateTime.now(), ZonedDateTime.now(), false, Duration.ZERO))
-    val sunsetEvent: State<Event> = _sunsetEvent
+    private val _sunsetAlarmState =
+        mutableStateOf(SunAlarm(ZonedDateTime.now(), ZonedDateTime.now(), false, Duration.ZERO))
+    val sunsetAlarmState: State<SunAlarm> = _sunsetAlarmState
+
+    private val sunriseAlarm = SunriseAlarm()
+    private val sunsetAlarm = SunsetAlarm()
 
     fun onSetSunriseAlarm(enabled: Boolean) {
-        _sunriseEvent.value = _sunriseEvent.value.copy(notificationEnabled = enabled)
+        if (enabled) {
+            sunriseAlarm.enable()
+        } else {
+            sunriseAlarm.disable()
+        }
+
+        _sunriseAlarmState.value =
+            _sunriseAlarmState.value.copy(notificationEnabled = sunriseAlarm.isEnabled())
     }
 
     fun onSetSunsetAlarm(enabled: Boolean) {
-        _sunsetEvent.value = _sunsetEvent.value.copy(notificationEnabled = enabled)
+        if (enabled) {
+            sunsetAlarm.enable()
+        } else {
+            sunsetAlarm.disable()
+        }
+
+        _sunsetAlarmState.value =
+            _sunsetAlarmState.value.copy(notificationEnabled = sunsetAlarm.isEnabled())
     }
 
-    fun onSetSunriseAlarmDuration(hour: Int, minute: Int) {
+    fun onSetSunriseAlarmDuration(duration: Duration) {
+        sunriseAlarm.setSleepDuration(duration)
 
+        _sunriseAlarmState.value = _sunriseAlarmState.value.copy(
+            notificationTime = sunriseAlarm.alarmTime(),
+            notificationEnabled = sunriseAlarm.isEnabled(),
+            notificationDuration = sunriseAlarm.sleepDuration()
+        )
     }
 
-    fun onSetSunsetAlarmDuration(hour: Int, minute: Int) {
+    fun onSetSunsetAlarmDuration(duration: Duration) {
+        sunsetAlarm.setSleepDuration(duration)
 
+        _sunsetAlarmState.value = _sunsetAlarmState.value.copy(
+            notificationTime = sunsetAlarm.alarmTime(),
+            notificationEnabled = sunsetAlarm.isEnabled(),
+            notificationDuration = sunsetAlarm.sleepDuration()
+        )
     }
 }
