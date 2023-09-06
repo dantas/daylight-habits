@@ -3,9 +3,12 @@
 package com.damiandantas.daylighthabits.ui.screen
 
 import android.app.TimePickerDialog
+import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -25,8 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -161,7 +166,7 @@ private fun AlarmScreenCard(
                         modifier = Modifier.padding(top = cardPadding)
                     )
 
-                    LabeledTime(
+                    LabeledDuration(
                         title = stringResource(cardResources.duration),
                         hour = sunAlarm.notificationDuration.hours,
                         minute = sunAlarm.notificationDuration.minutes,
@@ -203,7 +208,7 @@ private val cardMargin = 16.dp
 private val cardPadding = 10.dp
 
 private inline val titleStyle: TextStyle
-    @Composable get() = MaterialTheme.typography.titleLarge
+    @Composable get() = MaterialTheme.typography.bodyLarge
 
 private val Duration.hours
     get() = toHours().toInt()
@@ -231,4 +236,40 @@ private fun LabeledTime(title: String, hour: Int, minute: Int, modifier: Modifie
             style = MaterialTheme.typography.bodyMedium,
         )
     }
+}
+
+@Composable
+private fun LabeledDuration(title: String, hour: Int, minute: Int, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(text = title, style = titleStyle)
+        Row {
+            LabeledDurationTimeComponent(hour)
+            LabeledDurationTimeComponentDescription(pluralRes = R.plurals.hour, count = hour)
+            LabeledDurationTimeComponent(minute)
+            LabeledDurationTimeComponentDescription(pluralRes = R.plurals.minute, count = minute)
+        }
+    }
+}
+
+@Composable
+private fun LabeledDurationTimeComponent(timeComponent: Int) {
+    Text(
+        text = String.format("%d", timeComponent),
+        style = MaterialTheme.typography.bodyMedium,
+        fontWeight = FontWeight.Bold
+    )
+}
+
+@Composable
+private fun RowScope.LabeledDurationTimeComponentDescription(
+    @PluralsRes pluralRes: Int,
+    count: Int
+) {
+    Text(
+        text = pluralStringResource(id = pluralRes, count = count),
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier
+            .align(Alignment.Bottom)
+            .padding(horizontal = 4.dp)
+    )
 }

@@ -10,6 +10,16 @@
     <string name="sunset_card_title">Sunset</string>
     <string name="sunset_card_sun_time">Sunset time</string>
     <string name="sunset_card_alarm">Go outside at</string>
-    <string name="sunset_card_duration">Heads-up time</string>
-    <string name="sunset_card_set_duration">Set heads-up time</string>
+    <string name="sunset_card_duration">Timer to go outside</string>
+    <string name="sunset_card_set_duration">Set timer</string>
+
+    <plurals name="hour">
+        <item quantity="one">hour</item>
+        <item quantity="other">hours</item>
+    </plurals>
+
+    <plurals name="minute">
+        <item quantity="one">minute</item>
+        <item quantity="other">minutes</item>
+    </plurals>
 </resources>
