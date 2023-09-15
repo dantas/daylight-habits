@@ -25,11 +25,15 @@ class Alarm(
         scheduleForTomorrow()
     }
 
-    suspend fun sleepDuration(): Duration = storage.sleepDuration()
+    suspend fun duration(): Duration? = storage.sleepDuration()
 
+    fun alarmTime(): ZonedDateTime? = scheduler.scheduledTime()
+
+    // TODO: Get next sunrise, which can be in a few hours or only tomorrow.
     private suspend fun scheduleForTomorrow() {
         scheduler.unschedule()
-        val alarmTime = tomorrowForecast().minus(sleepDuration())
+        storage.sleepDuration()
+        val alarmTime = tomorrowForecast().minus(duration())
         scheduler.schedule(alarmTime)
     }
 }

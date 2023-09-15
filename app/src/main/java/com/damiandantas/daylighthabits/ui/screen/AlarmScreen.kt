@@ -46,8 +46,8 @@ fun AlarmScreen() {
     val viewModel: AlarmScreenViewModel = hiltViewModel()
 
     AlarmScreenContent(
-        sunriseAlarm = viewModel.sunriseAlarmState.value,
-        sunsetAlarm = viewModel.sunsetAlarmState.value,
+        sunriseMoment = viewModel.sunrise.value,
+        sunsetMoment = viewModel.sunset.value,
         onSetSunriseAlarm = viewModel::onSetSunriseAlarm,
         onSetSunriseAlarmDuration = viewModel::onSetSunriseAlarmDuration,
         onSetSunsetAlarm = viewModel::onSetSunsetAlarm,
@@ -60,17 +60,21 @@ fun AlarmScreen() {
 fun AlarmScreenPreview() {
     AppTheme {
         AlarmScreenContent(
-            sunriseAlarm = AlarmScreenViewModel.SunAlarm(
+            sunriseMoment = AlarmScreenViewModel.SunMoment(
                 ZonedDateTime.now(),
-                ZonedDateTime.now().minusHours(8),
                 true,
-                Duration.ofHours(8)
+                AlarmScreenViewModel.SunMomentAlarm(
+                    ZonedDateTime.now().minusMinutes(8),
+                    Duration.ofMinutes(8)
+                )
             ),
-            sunsetAlarm = AlarmScreenViewModel.SunAlarm(
+            sunsetMoment = AlarmScreenViewModel.SunMoment(
                 ZonedDateTime.now(),
-                ZonedDateTime.now().minusMinutes(15),
                 true,
-                Duration.ofMinutes(15)
+                AlarmScreenViewModel.SunMomentAlarm(
+                    ZonedDateTime.now().minusMinutes(15),
+                    Duration.ofMinutes(15)
+                )
             ),
             onSetSunriseAlarm = {},
             onSetSunriseAlarmDuration = { _ -> },
@@ -82,8 +86,8 @@ fun AlarmScreenPreview() {
 
 @Composable
 private fun AlarmScreenContent(
-    sunriseAlarm: AlarmScreenViewModel.SunAlarm,
-    sunsetAlarm: AlarmScreenViewModel.SunAlarm,
+    sunriseMoment: AlarmScreenViewModel.SunMoment,
+    sunsetMoment: AlarmScreenViewModel.SunMoment,
     onSetSunriseAlarm: (Boolean) -> Unit,
     onSetSunriseAlarmDuration: (Duration) -> Unit,
     onSetSunsetAlarm: (Boolean) -> Unit,
@@ -100,7 +104,7 @@ private fun AlarmScreenContent(
                     setDuration = R.string.sunrise_card_set_duration
                 )
             },
-            sunAlarm = sunriseAlarm,
+            sunMoment = sunriseMoment,
             onSetAlarm = onSetSunriseAlarm,
             onSetAlarmDuration = onSetSunriseAlarmDuration
         )
@@ -115,7 +119,7 @@ private fun AlarmScreenContent(
                     setDuration = R.string.sunset_card_set_duration
                 )
             },
-            sunAlarm = sunsetAlarm,
+            sunMoment = sunsetMoment,
             onSetAlarm = onSetSunsetAlarm,
             onSetAlarmDuration = onSetSunsetAlarmDuration
         )
@@ -125,7 +129,7 @@ private fun AlarmScreenContent(
 @Composable
 private fun AlarmScreenCard(
     cardResources: AlarmScreenRes,
-    sunAlarm: AlarmScreenViewModel.SunAlarm,
+    sunMoment: AlarmScreenViewModel.SunMoment,
     onSetAlarm: (enabled: Boolean) -> Unit,
     onSetAlarmDuration: (Duration) -> Unit
 ) {
@@ -140,12 +144,12 @@ private fun AlarmScreenCard(
                 .padding(all = cardPadding)
         ) {
             FilledIconToggleButton(
-                checked = sunAlarm.notificationEnabled,
+                checked = sunMoment.isAlarmEnabled,
                 onCheckedChange = onSetAlarm,
                 modifier = Modifier.align(Alignment.CenterEnd)
             ) {
                 val icon =
-                    if (sunAlarm.notificationEnabled) R.drawable.alarm_on else R.drawable.alarm_off
+                    if (sunMoment.isAlarmEnabled) R.drawable.alarm_on else R.drawable.alarm_off
                 Icon(painterResource(id = icon), null)
             }
 
@@ -154,24 +158,26 @@ private fun AlarmScreenCard(
             ) {
                 LabeledTime(
                     title = stringResource(cardResources.sunTime),
-                    hour = sunAlarm.time.hour,
-                    minute = sunAlarm.time.minute
+                    hour = sunMoment.time.hour,
+                    minute = sunMoment.time.minute
                 )
 
-                if (sunAlarm.notificationEnabled) {
-                    LabeledTime(
-                        title = stringResource(cardResources.alarm),
-                        hour = sunAlarm.notificationTime.hour,
-                        minute = sunAlarm.notificationTime.minute,
-                        modifier = Modifier.padding(top = cardPadding)
-                    )
+                if (sunMoment.isAlarmEnabled) {
+                    sunMoment.alarm?.let { alarm ->
+                        LabeledTime(
+                            title = stringResource(cardResources.alarm),
+                            hour = alarm.time.hour,
+                            minute = alarm.time.minute,
+                            modifier = Modifier.padding(top = cardPadding)
+                        )
 
-                    LabeledDuration(
-                        title = stringResource(cardResources.duration),
-                        hour = sunAlarm.notificationDuration.hours,
-                        minute = sunAlarm.notificationDuration.minutes,
-                        modifier = Modifier.padding(top = cardPadding)
-                    )
+                        LabeledDuration(
+                            title = stringResource(cardResources.duration),
+                            hour = alarm.duration.hours,
+                            minute = alarm.duration.minutes,
+                            modifier = Modifier.padding(top = cardPadding)
+                        )
+                    }
 
                     Button(
                         onClick = {
@@ -192,8 +198,8 @@ private fun AlarmScreenCard(
                             onSetAlarmDuration(duration)
                             showSleepDurationDialog = false
                         },
-                        sunAlarm.notificationDuration.hours,
-                        sunAlarm.notificationDuration.minutes,
+                        sunMoment.alarm?.duration?.hours ?: 0,
+                        sunMoment.alarm?.duration?.minutes ?: 0,
                         true
                     )
                     dialog.setOnCancelListener { showSleepDurationDialog = false }

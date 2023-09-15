@@ -3,72 +3,105 @@ package com.damiandantas.daylighthabits.presentation
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.damiandantas.daylighthabits.domain.SunriseAlarm
-import com.damiandantas.daylighthabits.domain.SunsetAlarm
+import androidx.lifecycle.viewModelScope
+import com.damiandantas.daylighthabits.di.Sunrise
+import com.damiandantas.daylighthabits.di.Sunset
+import com.damiandantas.daylighthabits.domain.Alarm
+import com.damiandantas.daylighthabits.domain.SunForecast
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class AlarmScreenViewModel @Inject constructor(
-    private val sunriseAlarm: SunriseAlarm,
-    private val sunsetAlarm: SunsetAlarm
+    @Sunrise private val sunriseAlarm: Alarm,
+    @Sunset private val sunsetAlarm: Alarm,
+    private val sunForecast: SunForecast
 ) : ViewModel() {
-    data class SunAlarm(
+    data class SunMoment(
         val time: ZonedDateTime,
-        val notificationTime: ZonedDateTime,
-        val notificationEnabled: Boolean,
-        val notificationDuration: Duration
+        val isAlarmEnabled: Boolean,
+        val alarm: SunMomentAlarm?,
     )
 
-    private val _sunriseAlarmState =
-        mutableStateOf(SunAlarm(ZonedDateTime.now(), ZonedDateTime.now(), false, Duration.ZERO))
-    val sunriseAlarmState: State<SunAlarm> = _sunriseAlarmState
+    data class SunMomentAlarm(
+        val time: ZonedDateTime,
+        val duration: Duration,
+    )
 
-    private val _sunsetAlarmState =
-        mutableStateOf(SunAlarm(ZonedDateTime.now(), ZonedDateTime.now(), false, Duration.ZERO))
-    val sunsetAlarmState: State<SunAlarm> = _sunsetAlarmState
+    private val sunriseMomentManager = SunMomentManager(sunriseAlarm)
+    private val sunsetMomentManager = SunMomentManager(sunsetAlarm)
+
+    val sunrise: State<SunMoment> = sunriseMomentManager.state
+    val sunset: State<SunMoment> = sunsetMomentManager.state
+
+    init {
+        viewModelScope.launch(Dispatchers.Default) {
+            val forecast = sunForecast.tomorrow() // TODO: Not tomorrow but next sunrise
+            sunriseMomentManager.setState(forecast.sunrise)
+            sunsetMomentManager.setState(forecast.sunset)
+        }
+    }
 
     fun onSetSunriseAlarm(enabled: Boolean) {
-        if (enabled) {
-            sunriseAlarm.enable()
-        } else {
-            sunriseAlarm.disable()
+        viewModelScope.launch {
+            sunriseMomentManager.setAlarm(enabled)
         }
-
-        _sunriseAlarmState.value =
-            _sunriseAlarmState.value.copy(notificationEnabled = sunriseAlarm.isEnabled())
     }
 
     fun onSetSunsetAlarm(enabled: Boolean) {
-        if (enabled) {
-            sunsetAlarm.enable()
-        } else {
-            sunsetAlarm.disable()
+        viewModelScope.launch {
+            sunsetMomentManager.setAlarm(enabled)
         }
-
-        _sunsetAlarmState.value =
-            _sunsetAlarmState.value.copy(notificationEnabled = sunsetAlarm.isEnabled())
     }
 
     fun onSetSunriseAlarmDuration(duration: Duration) {
-        sunriseAlarm.setSleepDuration(duration)
-
-        _sunriseAlarmState.value = _sunriseAlarmState.value.copy(
-            notificationTime = sunriseAlarm.alarmTime(),
-            notificationEnabled = sunriseAlarm.isEnabled(),
-            notificationDuration = sunriseAlarm.sleepDuration()
-        )
+        viewModelScope.launch {
+            sunriseMomentManager.setDuration(duration)
+        }
     }
 
     fun onSetSunsetAlarmDuration(duration: Duration) {
-        sunsetAlarm.setSleepDuration(duration)
+        viewModelScope.launch {
+            sunsetMomentManager.setDuration(duration)
+        }
+    }
+}
 
-        _sunsetAlarmState.value = _sunsetAlarmState.value.copy(
-            notificationTime = sunsetAlarm.alarmTime(),
-            notificationEnabled = sunsetAlarm.isEnabled(),
-            notificationDuration = sunsetAlarm.sleepDuration()
-        )
+private class SunMomentManager(
+    private val alarm: Alarm
+) {
+    val state =
+        mutableStateOf(AlarmScreenViewModel.SunMoment(ZonedDateTime.now(), false, null))
+
+    suspend fun setState(momentTime: ZonedDateTime) {
+        val alarmTime = alarm.alarmTime()
+        val duration = alarm.duration()
+        var sunMomentAlarm: AlarmScreenViewModel.SunMomentAlarm? = null
+
+        if (alarmTime != null && duration != null) {
+            sunMomentAlarm = AlarmScreenViewModel.SunMomentAlarm(alarmTime, duration)
+        }
+
+        state.value =
+            AlarmScreenViewModel.SunMoment(momentTime, alarm.isEnabled(), sunMomentAlarm)
+    }
+
+    suspend fun setAlarm(enabled: Boolean) {
+        if (enabled) {
+            alarm.enable()
+        } else {
+            alarm.disable()
+        }
+
+        setState(state.value.time)
+    }
+
+    suspend fun setDuration(duration: Duration) {
+        alarm.setSleepDuration(duration)
+        setState(state.value.time)
     }
 }
