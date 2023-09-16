@@ -40,7 +40,7 @@ class AlarmScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            val forecast = sunForecast.tomorrow() // TODO: Not tomorrow but next sunrise
+            val forecast = sunForecast.nextForecast()
             sunriseMomentManager.setState(forecast.sunrise)
             sunsetMomentManager.setState(forecast.sunset)
         }

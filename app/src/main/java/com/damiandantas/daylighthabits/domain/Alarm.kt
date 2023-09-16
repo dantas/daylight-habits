@@ -6,11 +6,11 @@ import java.time.ZonedDateTime
 class Alarm(
     private val storage: AlarmStorage,
     private val scheduler: AlarmScheduler,
-    private val tomorrowForecast: suspend () -> ZonedDateTime
+    private val nextForecast: suspend () -> ZonedDateTime
 ) {
     suspend fun enable() {
         storage.enable()
-        scheduleForTomorrow()
+        scheduleAlarmForNextForecast()
     }
 
     suspend fun disable() {
@@ -22,18 +22,17 @@ class Alarm(
 
     suspend fun setSleepDuration(duration: Duration) {
         storage.setSleepDuration(duration)
-        scheduleForTomorrow()
+        scheduleAlarmForNextForecast()
     }
 
     suspend fun duration(): Duration? = storage.sleepDuration()
 
     fun alarmTime(): ZonedDateTime? = scheduler.scheduledTime()
 
-    // TODO: Get next sunrise, which can be in a few hours or only tomorrow.
-    private suspend fun scheduleForTomorrow() {
+    private suspend fun scheduleAlarmForNextForecast() {
         scheduler.unschedule()
         storage.sleepDuration()
-        val alarmTime = tomorrowForecast().minus(duration())
+        val alarmTime = nextForecast().minus(duration())
         scheduler.schedule(alarmTime)
     }
 }

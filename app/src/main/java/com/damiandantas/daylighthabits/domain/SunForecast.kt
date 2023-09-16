@@ -22,11 +22,29 @@ class SunForecast @Inject constructor(
     private val clock: Clock,
     private val zoneId: ZoneId
 ) {
-    suspend fun tomorrow(): Forecast = withContext(Dispatchers.Default) {
-        val tomorrow = LocalDate.now(clock).plusDays(1)
+    suspend fun nextForecast(): Forecast = withContext(Dispatchers.Default) {
+        val now = ZonedDateTime.now(clock)
 
-        calculateSunForecast(locationProvider.currentLocation(), tomorrow, zoneId)
+        val todayForecast = forecastOn(now.toLocalDate())
+
+        if (now.isBefore(todayForecast.sunrise)) {
+            return@withContext todayForecast
+        }
+
+        val tomorrowForecast = forecastOn(now.toLocalDate().plusDays(1))
+
+        if (now.isAfter(todayForecast.sunset)) {
+            return@withContext tomorrowForecast
+        }
+
+        Forecast(
+            sunrise = tomorrowForecast.sunrise,
+            sunset = todayForecast.sunset,
+        )
     }
+
+    private suspend fun forecastOn(date: LocalDate): Forecast =
+        calculateSunForecast(locationProvider.currentLocation(), date, zoneId)
 }
 
 // Code below is inspired by https://en.wikipedia.org/wiki/Sunrise_equation
