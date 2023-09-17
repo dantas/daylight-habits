@@ -35,14 +35,22 @@ class AlarmScreenViewModel @Inject constructor(
     private val sunriseMomentManager = SunMomentManager(sunriseAlarm)
     private val sunsetMomentManager = SunMomentManager(sunsetAlarm)
 
-    val sunrise: State<SunMoment> = sunriseMomentManager.state
-    val sunset: State<SunMoment> = sunsetMomentManager.state
+    val sunrise: State<SunMoment?> = sunriseMomentManager.state
+    val sunset: State<SunMoment?> = sunsetMomentManager.state
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
             val forecast = sunForecast.nextForecast()
-            sunriseMomentManager.setState(forecast.sunrise)
-            sunsetMomentManager.setState(forecast.sunset)
+
+            sunriseMomentManager.apply {
+                momentTime = forecast.sunrise
+                updateState()
+            }
+
+            sunsetMomentManager.apply {
+                momentTime = forecast.sunset
+                updateState()
+            }
         }
     }
 
@@ -74,10 +82,11 @@ class AlarmScreenViewModel @Inject constructor(
 private class SunMomentManager(
     private val alarm: Alarm
 ) {
-    val state =
-        mutableStateOf(AlarmScreenViewModel.SunMoment(ZonedDateTime.now(), false, null))
+    val state = mutableStateOf<AlarmScreenViewModel.SunMoment?>(null)
 
-    suspend fun setState(momentTime: ZonedDateTime) {
+    lateinit var momentTime: ZonedDateTime
+
+    suspend fun updateState() {
         val alarmTime = alarm.alarmTime()
         val duration = alarm.duration()
         var sunMomentAlarm: AlarmScreenViewModel.SunMomentAlarm? = null
@@ -97,11 +106,11 @@ private class SunMomentManager(
             alarm.disable()
         }
 
-        setState(state.value.time)
+        updateState()
     }
 
     suspend fun setDuration(duration: Duration) {
         alarm.setSleepDuration(duration)
-        setState(state.value.time)
+        updateState()
     }
 }
