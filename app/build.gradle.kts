@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.android")
+    id("com.google.protobuf") // Feature: DataStore
+
     kotlin("kapt")
 }
 
@@ -55,6 +57,22 @@ kapt {
     correctErrorTypes = true // Added because of Hilt
 }
 
+// Feature: DataStore
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.21.7"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -78,4 +96,9 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     testImplementation("junit:junit:4.13.2")
+
+    // Feature: DataStore
+    implementation("androidx.datastore:datastore:1.0.0")
+    implementation("com.google.protobuf:protobuf-javalite:3.18.0")
+
 }
