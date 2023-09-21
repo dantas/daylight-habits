@@ -30,9 +30,9 @@ class Alarm(
     fun alarmTime(): ZonedDateTime? = scheduler.scheduledTime()
 
     private suspend fun scheduleAlarmForNextForecast() {
+        val duration = duration() ?: return
         scheduler.unschedule()
-        storage.sleepDuration()
-        val alarmTime = nextForecast().minus(duration())
+        val alarmTime = nextForecast().minus(duration)
         scheduler.schedule(alarmTime)
     }
 }
