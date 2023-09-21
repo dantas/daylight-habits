@@ -26,12 +26,12 @@ class AlarmStorageDataStore(
     override suspend fun isEnabled(): Boolean =
         alarmStorageDataStore.data.map {
             it.isEnabled
-        }.flowOn(Dispatchers.IO).first()
+        }.first()
 
     override suspend fun sleepDuration(): Duration? =
         alarmStorageDataStore.data.map {
             if (it.duration == 0L) null else Duration.ofMillis(it.duration)
-        }.flowOn(Dispatchers.IO).first()
+        }.first()
 
     override suspend fun setSleepDuration(duration: Duration) {
         alarmStorageDataStore.updateData {
