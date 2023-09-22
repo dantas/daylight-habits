@@ -24,8 +24,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        var showAppScreen by mutableStateOf(false)
+
         val activityResult =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                showAppScreen = it
                 if (!it) finish()
             }
 
@@ -49,7 +52,9 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                AppScreen()
+                if (showAppScreen) {
+                    AppScreen()
+                }
             }
         }
     }
