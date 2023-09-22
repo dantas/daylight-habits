@@ -27,12 +27,11 @@ class Alarm(
 
     suspend fun duration(): Duration? = storage.sleepDuration()
 
-    fun alarmTime(): ZonedDateTime? = scheduler.scheduledTime()
+    suspend fun alarmTime(): ZonedDateTime? = duration()?.let(nextForecast()::minus)
 
     private suspend fun scheduleAlarmForNextForecast() {
-        val duration = duration() ?: return
-        scheduler.unschedule()
-        val alarmTime = nextForecast().minus(duration)
+        val alarmTime = alarmTime() ?: return
+        scheduler.unschedule() // TODO: DO we need to unschedule?
         scheduler.schedule(alarmTime)
     }
 }
