@@ -10,7 +10,7 @@
     <string name="sunset_card_title">Sunset</string>
     <string name="sunset_card_sun_time">Sunset time</string>
     <string name="sunset_card_alarm">Go outside at</string>
-    <string name="sunset_card_duration">Timer to go outside</string>
+    <string name="sunset_card_duration">Time to go outside</string>
     <string name="sunset_card_set_duration">Set timer</string>
 
     <plurals name="hour">
