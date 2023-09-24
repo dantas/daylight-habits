@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.damiandantas.daylighthabits.R
+import com.damiandantas.daylighthabits.domain.AlarmInfo
 import com.damiandantas.daylighthabits.presentation.AlarmScreenViewModel
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import java.time.Duration
@@ -65,17 +66,17 @@ fun AlarmScreenPreview() {
             sunriseMoment = AlarmScreenViewModel.SunMoment(
                 ZonedDateTime.now(),
                 true,
-                AlarmScreenViewModel.SunMomentAlarm(
-                    ZonedDateTime.now().minusMinutes(8),
-                    Duration.ofMinutes(8)
+                AlarmInfo(
+                    Duration.ofMinutes(8),
+                    ZonedDateTime.now().minusMinutes(8)
                 )
             ),
             sunsetMoment = AlarmScreenViewModel.SunMoment(
                 ZonedDateTime.now(),
                 true,
-                AlarmScreenViewModel.SunMomentAlarm(
-                    ZonedDateTime.now().minusMinutes(15),
-                    Duration.ofMinutes(15)
+                AlarmInfo(
+                    Duration.ofMinutes(15),
+                    ZonedDateTime.now().minusMinutes(15)
                 )
             ),
             onSetSunriseAlarm = {},

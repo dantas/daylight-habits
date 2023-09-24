@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.damiandantas.daylighthabits.di.Sunrise
 import com.damiandantas.daylighthabits.di.Sunset
 import com.damiandantas.daylighthabits.domain.Alarm
+import com.damiandantas.daylighthabits.domain.AlarmInfo
 import com.damiandantas.daylighthabits.domain.SunForecast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -24,12 +25,7 @@ class AlarmScreenViewModel @Inject constructor(
     data class SunMoment(
         val time: ZonedDateTime,
         val isAlarmEnabled: Boolean,
-        val alarm: SunMomentAlarm?,
-    )
-
-    data class SunMomentAlarm(
-        val time: ZonedDateTime,
-        val duration: Duration,
+        val alarm: AlarmInfo?,
     )
 
     private val sunriseMomentManager = SunMomentManager(sunriseAlarm)
@@ -87,16 +83,8 @@ private class SunMomentManager(
     lateinit var momentTime: ZonedDateTime
 
     suspend fun updateState() {
-        val alarmTime = alarm.alarmTime()
-        val duration = alarm.duration()
-        var sunMomentAlarm: AlarmScreenViewModel.SunMomentAlarm? = null
-
-        if (alarmTime != null && duration != null) {
-            sunMomentAlarm = AlarmScreenViewModel.SunMomentAlarm(alarmTime, duration)
-        }
-
         state.value =
-            AlarmScreenViewModel.SunMoment(momentTime, alarm.isEnabled(), sunMomentAlarm)
+            AlarmScreenViewModel.SunMoment(momentTime, alarm.isEnabled(), alarm.info())
     }
 
     suspend fun setAlarm(enabled: Boolean) {

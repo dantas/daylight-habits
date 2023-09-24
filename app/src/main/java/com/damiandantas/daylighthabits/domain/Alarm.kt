@@ -3,6 +3,8 @@ package com.damiandantas.daylighthabits.domain
 import java.time.Duration
 import java.time.ZonedDateTime
 
+data class AlarmInfo(val duration: Duration, val time: ZonedDateTime)
+
 class Alarm(
     private val storage: AlarmStorage,
     private val scheduler: AlarmScheduler,
@@ -25,13 +27,15 @@ class Alarm(
         scheduleAlarmForNextForecast()
     }
 
-    suspend fun duration(): Duration? = storage.sleepDuration()
-
-    suspend fun alarmTime(): ZonedDateTime? = duration()?.let(nextForecast()::minus)
+    suspend fun info(): AlarmInfo? {
+        val duration = storage.sleepDuration() ?: return null
+        val time = nextForecast().minus(duration)
+        return AlarmInfo(duration, time)
+    }
 
     private suspend fun scheduleAlarmForNextForecast() {
-        val alarmTime = alarmTime() ?: return
+        val alarmInfo = info() ?: return
         scheduler.unschedule() // TODO: DO we need to unschedule?
-        scheduler.schedule(alarmTime)
+        scheduler.schedule(alarmInfo.time)
     }
 }
