@@ -1,41 +1,47 @@
 package com.damiandantas.daylighthabits.domain
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import java.time.Duration
 import java.time.ZonedDateTime
 
-data class AlarmInfo(val duration: Duration, val time: ZonedDateTime)
+// TODO: Notify storage error
+
+data class Timer(val time: ZonedDateTime, val duration: Duration)
 
 class Alarm(
     private val storage: AlarmStorage,
     private val scheduler: AlarmScheduler,
     private val nextForecast: suspend () -> ZonedDateTime
 ) {
-    suspend fun enable() {
-        storage.enable()
-        scheduleAlarmForNextForecast()
+    val isEnabled: Flow<Boolean> = storage.isEnabled
+
+    val timer: Flow<Timer> =
+        storage.timerDuration.map { duration ->
+            Timer(time = nextForecast().minus(duration), duration = duration)
+        }
+
+    suspend fun setEnabled(isEnabled: Boolean) {
+        if (storage.setEnabled(isEnabled).isFailure) return
+
+        if (isEnabled) {
+            scheduleTimer()
+        } else {
+            scheduler.unschedule()
+        }
     }
 
-    suspend fun disable() {
-        storage.disable()
-        scheduler.unschedule()
+    suspend fun setTimerDuration(duration: Duration) {
+        if (storage.setTimerDuration(duration).isSuccess) {
+            scheduleTimer()
+        }
     }
 
-    suspend fun isEnabled(): Boolean = storage.isEnabled()
-
-    suspend fun setSleepDuration(duration: Duration) {
-        storage.setSleepDuration(duration)
-        scheduleAlarmForNextForecast()
-    }
-
-    suspend fun info(): AlarmInfo? {
-        val duration = storage.sleepDuration() ?: return null
-        val time = nextForecast().minus(duration)
-        return AlarmInfo(duration, time)
-    }
-
-    private suspend fun scheduleAlarmForNextForecast() {
-        val alarmInfo = info() ?: return
+    private suspend fun scheduleTimer() {
+        if (!isEnabled.first()) return
+        val timer = timer.first()
         scheduler.unschedule() // TODO: DO we need to unschedule?
-        scheduler.schedule(alarmInfo.time)
+        scheduler.schedule(timer.time)
     }
 }

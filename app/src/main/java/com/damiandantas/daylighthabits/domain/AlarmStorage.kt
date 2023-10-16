@@ -1,11 +1,12 @@
 package com.damiandantas.daylighthabits.domain
 
+import kotlinx.coroutines.flow.Flow
 import java.time.Duration
 
 interface AlarmStorage {
-    suspend fun isEnabled(): Boolean
-    suspend fun enable()
-    suspend fun disable()
-    suspend fun sleepDuration(): Duration?
-    suspend fun setSleepDuration(duration: Duration)
+    val isEnabled: Flow<Boolean>
+    suspend fun setEnabled(enabled: Boolean): Result<Unit>
+
+    val timerDuration: Flow<Duration>
+    suspend fun setTimerDuration(duration: Duration): Result<Unit>
 }

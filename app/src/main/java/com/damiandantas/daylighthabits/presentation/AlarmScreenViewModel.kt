@@ -1,16 +1,17 @@
 package com.damiandantas.daylighthabits.presentation
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.damiandantas.daylighthabits.di.Sunrise
 import com.damiandantas.daylighthabits.di.Sunset
 import com.damiandantas.daylighthabits.domain.Alarm
-import com.damiandantas.daylighthabits.domain.AlarmInfo
 import com.damiandantas.daylighthabits.domain.SunForecast
+import com.damiandantas.daylighthabits.domain.Timer
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -20,85 +21,51 @@ import javax.inject.Inject
 class AlarmScreenViewModel @Inject constructor(
     @Sunrise private val sunriseAlarm: Alarm,
     @Sunset private val sunsetAlarm: Alarm,
-    private val sunForecast: SunForecast
+    private val sunForecast: SunForecast // TODO: Replace with some sort of cache
 ) : ViewModel() {
-    data class SunMoment(
-        val time: ZonedDateTime,
+    data class CardState(
+        val sunTime: ZonedDateTime,
         val isAlarmEnabled: Boolean,
-        val alarm: AlarmInfo?,
+        val timer: Timer,
     )
 
-    private val sunriseMomentManager = SunMomentManager(sunriseAlarm)
-    private val sunsetMomentManager = SunMomentManager(sunsetAlarm)
+    val sunrise: StateFlow<CardState?> =
+        combine(
+            sunriseAlarm.isEnabled,
+            sunriseAlarm.timer,
+        ) { isEnabled, timeDuration ->
+            CardState(sunForecast.nextForecast().sunrise, isEnabled, timeDuration)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    val sunrise: State<SunMoment?> = sunriseMomentManager.state
-    val sunset: State<SunMoment?> = sunsetMomentManager.state
-
-    init {
-        viewModelScope.launch(Dispatchers.Default) {
-            val forecast = sunForecast.nextForecast()
-
-            sunriseMomentManager.apply {
-                momentTime = forecast.sunrise
-                updateState()
-            }
-
-            sunsetMomentManager.apply {
-                momentTime = forecast.sunset
-                updateState()
-            }
-        }
-    }
+    val sunset: StateFlow<CardState?> =
+        combine(
+            sunsetAlarm.isEnabled,
+            sunsetAlarm.timer,
+        ) { isEnabled, timeDuration ->
+            CardState(sunForecast.nextForecast().sunset, isEnabled, timeDuration)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     fun onSetSunriseAlarm(enabled: Boolean) {
         viewModelScope.launch {
-            sunriseMomentManager.setAlarm(enabled)
+            sunriseAlarm.setEnabled(enabled)
         }
     }
 
     fun onSetSunsetAlarm(enabled: Boolean) {
         viewModelScope.launch {
-            sunsetMomentManager.setAlarm(enabled)
+            sunsetAlarm.setEnabled(enabled)
         }
     }
 
-    fun onSetSunriseAlarmDuration(duration: Duration) {
+    fun onSetSunriseTimerDuration(duration: Duration) {
         viewModelScope.launch {
-            sunriseMomentManager.setDuration(duration)
+            sunriseAlarm.setTimerDuration(duration)
         }
     }
 
-    fun onSetSunsetAlarmDuration(duration: Duration) {
+    fun onSetSunsetTimerDuration(duration: Duration) {
         viewModelScope.launch {
-            sunsetMomentManager.setDuration(duration)
+            sunsetAlarm.setTimerDuration(duration)
         }
-    }
-}
-
-private class SunMomentManager(
-    private val alarm: Alarm
-) {
-    val state = mutableStateOf<AlarmScreenViewModel.SunMoment?>(null)
-
-    lateinit var momentTime: ZonedDateTime
-
-    suspend fun updateState() {
-        state.value =
-            AlarmScreenViewModel.SunMoment(momentTime, alarm.isEnabled(), alarm.info())
-    }
-
-    suspend fun setAlarm(enabled: Boolean) {
-        if (enabled) {
-            alarm.enable()
-        } else {
-            alarm.disable()
-        }
-
-        updateState()
-    }
-
-    suspend fun setDuration(duration: Duration) {
-        alarm.setSleepDuration(duration)
-        updateState()
     }
 }
