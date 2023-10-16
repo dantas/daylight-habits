@@ -1,6 +1,7 @@
 package com.damiandantas.daylighthabits.domain
 
-import kotlinx.coroutines.Dispatchers
+import com.damiandantas.daylighthabits.di.DispatcherDefault
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.time.Clock
 import java.time.Instant
@@ -20,9 +21,10 @@ import kotlin.math.sqrt
 class SunForecast @Inject constructor(
     private val locationProvider: LocationProvider,
     private val clock: Clock,
-    private val zoneId: ZoneId
+    private val zoneId: ZoneId,
+    @DispatcherDefault private val dispatcherDefault: CoroutineDispatcher
 ) {
-    suspend fun nextForecast(): Forecast = withContext(Dispatchers.Default) {
+    suspend fun nextForecast(): Forecast = withContext(dispatcherDefault) {
         val now = ZonedDateTime.now(clock)
 
         val todayForecast = forecastOn(now.toLocalDate())
