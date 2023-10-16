@@ -17,7 +17,7 @@ object AlarmModule {
     fun provideSunriseAlarm(
         sunForecast: SunForecast,
         @Sunrise storage: AlarmStorage,
-        scheduler: AlarmScheduler
+        @Sunrise scheduler: AlarmScheduler
     ): Alarm = Alarm(storage, scheduler) { sunForecast.nextForecast().sunrise }
 
     @Sunset
@@ -25,6 +25,6 @@ object AlarmModule {
     fun provideSunsetAlarm(
         sunForecast: SunForecast,
         @Sunset storage: AlarmStorage,
-        scheduler: AlarmScheduler
+        @Sunset scheduler: AlarmScheduler
     ): Alarm = Alarm(storage, scheduler) { sunForecast.nextForecast().sunset }
 }
