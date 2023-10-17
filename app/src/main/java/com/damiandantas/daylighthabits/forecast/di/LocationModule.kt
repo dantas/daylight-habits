@@ -1,7 +1,7 @@
-package com.damiandantas.daylighthabits.di
+package com.damiandantas.daylighthabits.forecast.di
 
-import com.damiandantas.daylighthabits.domain.LocationProvider
-import com.damiandantas.daylighthabits.system.FusedLocationProvider
+import com.damiandantas.daylighthabits.forecast.domain.LocationProvider
+import com.damiandantas.daylighthabits.forecast.system.FusedLocationProvider
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

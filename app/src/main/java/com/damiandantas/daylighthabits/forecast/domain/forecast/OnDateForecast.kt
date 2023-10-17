@@ -1,7 +1,7 @@
-package com.damiandantas.daylighthabits.domain.forecast
+package com.damiandantas.daylighthabits.forecast.domain.forecast
 
 import com.damiandantas.daylighthabits.di.DispatcherDefault
-import com.damiandantas.daylighthabits.domain.LocationProvider
+import com.damiandantas.daylighthabits.forecast.domain.LocationProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.time.LocalDate

@@ -1,8 +1,8 @@
-package com.damiandantas.daylighthabits.di
+package com.damiandantas.daylighthabits.forecast.di
 
-import com.damiandantas.daylighthabits.domain.forecast.CachedOnDateForecast
-import com.damiandantas.daylighthabits.domain.forecast.CalculateOnDateForecast
-import com.damiandantas.daylighthabits.domain.forecast.OnDateForecast
+import com.damiandantas.daylighthabits.forecast.domain.forecast.CachedOnDateForecast
+import com.damiandantas.daylighthabits.forecast.domain.forecast.CalculateOnDateForecast
+import com.damiandantas.daylighthabits.forecast.domain.forecast.OnDateForecast
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

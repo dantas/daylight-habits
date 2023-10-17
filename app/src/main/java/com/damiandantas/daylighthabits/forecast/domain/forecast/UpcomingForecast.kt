@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.domain.forecast
+package com.damiandantas.daylighthabits.forecast.domain.forecast
 
 import com.damiandantas.daylighthabits.di.DispatcherDefault
 import kotlinx.coroutines.CoroutineDispatcher
