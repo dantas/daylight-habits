@@ -1,14 +1,10 @@
-package com.damiandantas.daylighthabits.domain
+package com.damiandantas.daylighthabits.domain.forecast
 
-import com.damiandantas.daylighthabits.di.DispatcherDefault
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
-import java.time.Clock
+import com.damiandantas.daylighthabits.domain.Location
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import javax.inject.Inject
 import kotlin.math.acos
 import kotlin.math.asin
 import kotlin.math.cos
@@ -18,42 +14,12 @@ import kotlin.math.roundToLong
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class SunForecast @Inject constructor(
-    private val locationProvider: LocationProvider,
-    private val clock: Clock,
-    private val zoneId: ZoneId,
-    @DispatcherDefault private val dispatcherDefault: CoroutineDispatcher
-) {
-    suspend fun nextForecast(): Forecast = withContext(dispatcherDefault) {
-        val now = ZonedDateTime.now(clock)
-
-        val todayForecast = forecastOn(now.toLocalDate())
-
-        if (now.isBefore(todayForecast.sunrise)) {
-            return@withContext todayForecast
-        }
-
-        val tomorrowForecast = forecastOn(now.toLocalDate().plusDays(1))
-
-        if (now.isAfter(todayForecast.sunset)) {
-            return@withContext tomorrowForecast
-        }
-
-        Forecast(
-            sunrise = tomorrowForecast.sunrise,
-            sunset = todayForecast.sunset,
-        )
-    }
-
-    private suspend fun forecastOn(date: LocalDate): Forecast =
-        calculateSunForecast(locationProvider.currentLocation(), date, zoneId)
-}
-
 // Code below is inspired by https://en.wikipedia.org/wiki/Sunrise_equation
 
+// TODO: Consider converting ZonedDateTime into a value class
 data class Forecast(val sunrise: ZonedDateTime, val sunset: ZonedDateTime)
 
-private fun calculateSunForecast(location: Location, date: LocalDate, zone: ZoneId): Forecast {
+fun calculateForecast(location: Location, date: LocalDate, zone: ZoneId): Forecast {
     val julianDay = julianDay(date, zone)
     val meanSolarTime = meanSolarTime(julianDay, location)
     val solarMeanAnomaly = solarMeanAnomaly(meanSolarTime)
@@ -67,8 +33,8 @@ private fun calculateSunForecast(location: Location, date: LocalDate, zone: Zone
     val sunset = julianToInstant(solarTransit.value + hourAngle.value / 360)
 
     return Forecast(
-        sunrise.atZone(zone),
-        sunset.atZone(zone)
+        sunrise = sunrise.atZone(zone),
+        sunset = sunset.atZone(zone)
     )
 }
 
