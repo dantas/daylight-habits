@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.damiandantas.daylighthabits.ui.screen
+package com.damiandantas.daylighthabits.ui.screen.alert
 
 import android.app.TimePickerDialog
 import androidx.annotation.PluralsRes
@@ -39,106 +39,108 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.damiandantas.daylighthabits.R
-import com.damiandantas.daylighthabits.domain.Timer
-import com.damiandantas.daylighthabits.presentation.AlarmScreenViewModel
+import com.damiandantas.daylighthabits.alert.domain.Alert
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import java.time.Duration
 import java.time.ZonedDateTime
 
 @Composable
-fun AlarmScreen() {
-    val viewModel: AlarmScreenViewModel = hiltViewModel()
+fun AlertScreen() {
+    val sunriseViewModel: AlertScreenSunriseViewModel = hiltViewModel()
+    val sunsetViewModel: AlertScreenSunsetViewModel = hiltViewModel()
 
-    val sunriseCardState by viewModel.sunrise.collectAsStateWithLifecycle()
-    val sunsetCardState by viewModel.sunset.collectAsStateWithLifecycle()
+    // TODO: Check how this composable is recomposed on state change
+
+    val sunriseCardState = sunriseViewModel.cardState.collectAsStateWithLifecycle().value
+    val sunsetCardState = sunsetViewModel.cardState.collectAsStateWithLifecycle().value
 
     ScreenContent(
         sunriseCardState = sunriseCardState,
         sunsetCardState = sunsetCardState,
-        onSetSunriseAlarm = viewModel::onSetSunriseAlarm,
-        onSetSunriseTimerDuration = viewModel::onSetSunriseTimerDuration,
-        onSetSunsetAlarm = viewModel::onSetSunsetAlarm,
-        onSetSunsetTimerDuration = viewModel::onSetSunsetTimerDuration,
+        onSunriseSetEnable = sunriseViewModel::setEnabled,
+        onSunriseSetNoticeTime = sunriseViewModel::setNoticeTime,
+        onSunsetSetEnable = sunsetViewModel::setEnabled,
+        onSunsetSetNoticeTime = sunsetViewModel::setNoticeTime,
     )
 }
 
 @Composable
 @Preview(showSystemUi = true)
-fun AlarmScreenPreview() {
+fun AlertScreenPreview() {
     AppTheme {
         ScreenContent(
-            sunriseCardState = AlarmScreenViewModel.CardState(
+            sunriseCardState = AlertScreenCardState(
                 ZonedDateTime.now(),
                 true,
-                Timer(
+                Alert(
                     ZonedDateTime.now().minusMinutes(8),
                     Duration.ofMinutes(8)
                 )
             ),
-            sunsetCardState = AlarmScreenViewModel.CardState(
+            sunsetCardState = AlertScreenCardState(
                 ZonedDateTime.now(),
                 true,
-                Timer(
+                Alert(
                     ZonedDateTime.now().minusMinutes(15),
                     Duration.ofMinutes(15)
                 )
             ),
-            onSetSunriseAlarm = {},
-            onSetSunriseTimerDuration = { _ -> },
-            onSetSunsetAlarm = {},
-            onSetSunsetTimerDuration = { _ -> },
+            onSunriseSetEnable = {},
+            onSunriseSetNoticeTime = { _ -> },
+            onSunsetSetEnable = {},
+            onSunsetSetNoticeTime = { _ -> },
         )
     }
 }
 
 @Composable
 private fun ScreenContent(
-    sunriseCardState: AlarmScreenViewModel.CardState?,
-    sunsetCardState: AlarmScreenViewModel.CardState?,
-    onSetSunriseAlarm: (Boolean) -> Unit,
-    onSetSunriseTimerDuration: (Duration) -> Unit,
-    onSetSunsetAlarm: (Boolean) -> Unit,
-    onSetSunsetTimerDuration: (Duration) -> Unit,
+    sunriseCardState: AlertScreenCardState?,
+    sunsetCardState: AlertScreenCardState?,
+    onSunriseSetEnable: (Boolean) -> Unit,
+    onSunriseSetNoticeTime: (Duration) -> Unit,
+    onSunsetSetEnable: (Boolean) -> Unit,
+    onSunsetSetNoticeTime: (Duration) -> Unit,
 ) {
     Column {
         Card(
             cardResources = remember {
-                AlarmScreenRes(
+                AlertScreenRes(
                     title = R.string.sunrise_card_title,
                     sunTime = R.string.sunrise_card_sun_time,
-                    alarm = R.string.sunrise_card_alarm,
-                    duration = R.string.sunrise_card_duration,
-                    setDuration = R.string.sunrise_card_set_duration
+                    alertTime = R.string.sunrise_card_alert_time,
+                    noticeTime = R.string.sunrise_card_notice_time,
+                    setNoticeTime = R.string.sunrise_card_set_notice_time
                 )
             },
             cardState = sunriseCardState,
-            onSetAlarm = onSetSunriseAlarm,
-            onSetTimer = onSetSunriseTimerDuration
+            onSetEnable = onSunriseSetEnable,
+            onSetNoticeTime = onSunriseSetNoticeTime
         )
 
         Card(
             cardResources = remember {
-                AlarmScreenRes(
+                AlertScreenRes(
                     title = R.string.sunset_card_title,
                     sunTime = R.string.sunset_card_sun_time,
-                    alarm = R.string.sunset_card_alarm,
-                    duration = R.string.sunset_card_duration,
-                    setDuration = R.string.sunset_card_set_duration
+                    alertTime = R.string.sunset_card_alert_time,
+                    noticeTime = R.string.sunset_card_notice_time,
+                    setNoticeTime = R.string.sunset_card_set_notice_time
                 )
             },
             cardState = sunsetCardState,
-            onSetAlarm = onSetSunsetAlarm,
-            onSetTimer = onSetSunsetTimerDuration
+            onSetEnable = onSunsetSetEnable,
+            onSetNoticeTime = onSunsetSetNoticeTime
         )
     }
 }
 
 @Composable
 private fun Card(
-    cardResources: AlarmScreenRes,
-    cardState: AlarmScreenViewModel.CardState?,
-    onSetAlarm: (enabled: Boolean) -> Unit,
-    onSetTimer: (Duration) -> Unit
+    cardResources: AlertScreenRes,
+    cardState: AlertScreenCardState?,
+    onSetEnable: (enabled: Boolean) -> Unit,
+    onSetNoticeTime: (Duration) -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier.padding(top = cardMargin, start = cardMargin, end = cardMargin)
@@ -149,13 +151,13 @@ private fun Card(
                 .padding(all = cardPadding)
         ) {
             if (cardState == null) {
-                CardContentWithoutSunMoment()
+                CardWithoutState()
             } else {
-                CardContentWithSunMoment(
+                CardWithState(
                     cardResources = cardResources,
                     cardState = cardState,
-                    onSetAlarm = onSetAlarm,
-                    onSetTimer = onSetTimer,
+                    onSetEnable = onSetEnable,
+                    onSetNoticeTime = onSetNoticeTime,
                 )
             }
         }
@@ -163,28 +165,28 @@ private fun Card(
 }
 
 @Composable
-private fun BoxScope.CardContentWithoutSunMoment() {
+private fun BoxScope.CardWithoutState() {
     CircularProgressIndicator(
         modifier = Modifier.align(Alignment.Center)
     )
 }
 
 @Composable
-private fun BoxScope.CardContentWithSunMoment(
-    cardResources: AlarmScreenRes,
-    cardState: AlarmScreenViewModel.CardState,
-    onSetAlarm: (enabled: Boolean) -> Unit,
-    onSetTimer: (Duration) -> Unit
+private fun BoxScope.CardWithState(
+    cardResources: AlertScreenRes,
+    cardState: AlertScreenCardState,
+    onSetEnable: (enabled: Boolean) -> Unit,
+    onSetNoticeTime: (Duration) -> Unit
 ) {
     var showSleepDurationDialog by rememberSaveable { mutableStateOf(false) }
 
     FilledIconToggleButton(
-        checked = cardState.isAlarmEnabled,
-        onCheckedChange = onSetAlarm,
+        checked = cardState.isEnabled,
+        onCheckedChange = onSetEnable,
         modifier = Modifier.align(Alignment.CenterEnd)
     ) {
         val icon =
-            if (cardState.isAlarmEnabled) R.drawable.alarm_on else R.drawable.alarm_off
+            if (cardState.isEnabled) R.drawable.alert_on else R.drawable.alert_off
         Icon(painterResource(id = icon), null)
     }
 
@@ -197,20 +199,22 @@ private fun BoxScope.CardContentWithSunMoment(
             minute = cardState.sunTime.minute
         )
 
-        if (cardState.isAlarmEnabled) {
-            LabeledTime(
-                title = stringResource(cardResources.alarm),
-                hour = cardState.timer.time.hour,
-                minute = cardState.timer.time.minute,
-                modifier = Modifier.padding(top = cardPadding)
-            )
+        if (cardState.isEnabled) {
+            cardState.alert?.let { alert ->
+                LabeledTime(
+                    title = stringResource(cardResources.alertTime),
+                    hour = alert.time.hour,
+                    minute = alert.time.minute,
+                    modifier = Modifier.padding(top = cardPadding)
+                )
 
-            LabeledDuration(
-                title = stringResource(cardResources.duration),
-                hour = cardState.timer.duration.hours,
-                minute = cardState.timer.duration.minutes,
-                modifier = Modifier.padding(top = cardPadding)
-            )
+                LabeledDuration(
+                    title = stringResource(cardResources.noticeTime),
+                    hour = alert.noticeTime.hours,
+                    minute = alert.noticeTime.minutes,
+                    modifier = Modifier.padding(top = cardPadding)
+                )
+            }
 
             Button(
                 onClick = {
@@ -218,7 +222,7 @@ private fun BoxScope.CardContentWithSunMoment(
                 },
                 modifier = Modifier.padding(top = cardPadding)
             ) {
-                Text(stringResource(cardResources.setDuration))
+                Text(stringResource(cardResources.setNoticeTime))
             }
         }
 
@@ -228,11 +232,11 @@ private fun BoxScope.CardContentWithSunMoment(
                 { _, hour: Int, minute: Int ->
                     val duration =
                         Duration.ofHours(hour.toLong()).plusMinutes(minute.toLong())
-                    onSetTimer(duration)
+                    onSetNoticeTime(duration)
                     showSleepDurationDialog = false
                 },
-                cardState.timer.duration.hours,
-                cardState.timer.duration.minutes,
+                cardState.alert?.noticeTime?.hours ?: 0,
+                cardState.alert?.noticeTime?.minutes ?: 0,
                 true
             )
             dialog.setOnCancelListener { showSleepDurationDialog = false }
@@ -253,12 +257,12 @@ private val Duration.hours
 private val Duration.minutes
     get() = (toMinutes() % 60).toInt()
 
-private data class AlarmScreenRes(
+private data class AlertScreenRes(
     @StringRes val title: Int,
     @StringRes val sunTime: Int,
-    @StringRes val alarm: Int,
-    @StringRes val duration: Int,
-    @StringRes val setDuration: Int,
+    @StringRes val alertTime: Int,
+    @StringRes val noticeTime: Int,
+    @StringRes val setNoticeTime: Int,
 )
 
 @Composable

@@ -30,7 +30,7 @@
         </activity>
 
         <receiver
-            android:name=".system.AlarmSchedulerBootReceiver"
+            android:name=".alert.system.AlertSchedulerBootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -39,7 +39,7 @@
         </receiver>
 
         <receiver
-            android:name=".system.AlarmSchedulerPackageReplaced"
+            android:name=".alert.system.AlertSchedulerPackageReplaced"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

@@ -1,6 +1,6 @@
 package com.damiandantas.daylighthabits.forecast.domain.forecast
 
-import com.damiandantas.daylighthabits.di.DispatcherDefault
+import com.damiandantas.daylighthabits.common.di.DispatcherDefault
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.time.Clock

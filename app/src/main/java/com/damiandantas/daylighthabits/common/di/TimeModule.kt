@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.di
+package com.damiandantas.daylighthabits.common.di
 
 import dagger.Module
 import dagger.Provides
@@ -9,7 +9,7 @@ import java.time.ZoneId
 
 @Module
 @InstallIn(SingletonComponent::class)
-object SystemModule {
+object TimeModule {
     @Provides
     fun provideClock(): Clock = Clock.systemDefaultZone()
 

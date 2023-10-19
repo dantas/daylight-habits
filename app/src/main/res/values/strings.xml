@@ -3,15 +3,15 @@
 
     <string name="sunrise_card_title">Sunrise</string>
     <string name="sunrise_card_sun_time">Sunrise time</string>
-    <string name="sunrise_card_alarm">Sleep time</string>
-    <string name="sunrise_card_duration">Hours of sleep</string>
-    <string name="sunrise_card_set_duration">Set sleep duration</string>
+    <string name="sunrise_card_alert_time">Sleep time</string>
+    <string name="sunrise_card_notice_time">Hours of sleep</string>
+    <string name="sunrise_card_set_notice_time">Set sleep duration</string>
 
     <string name="sunset_card_title">Sunset</string>
     <string name="sunset_card_sun_time">Sunset time</string>
-    <string name="sunset_card_alarm">Go outside at</string>
-    <string name="sunset_card_duration">Time to go outside</string>
-    <string name="sunset_card_set_duration">Set timer</string>
+    <string name="sunset_card_alert_time">Go outside at</string>
+    <string name="sunset_card_notice_time">Time to go outside</string>
+    <string name="sunset_card_set_notice_time">Set timer</string>
 
     <plurals name="hour">
         <item quantity="one">hour</item>

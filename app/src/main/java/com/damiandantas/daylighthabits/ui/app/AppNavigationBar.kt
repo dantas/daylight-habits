@@ -21,7 +21,7 @@ fun AppNavigationBar(selectedItem: Int, onClick: (index: Int) -> Unit) {
 
     NavigationBar {
         AppNavigationBarItem(
-            index = 0, icon = R.drawable.alarm, label = "Alarm",
+            index = 0, icon = R.drawable.alert, label = "Alert",
             selected = selected, onClick = onClick
         )
 
@@ -31,7 +31,7 @@ fun AppNavigationBar(selectedItem: Int, onClick: (index: Int) -> Unit) {
         )
 
         AppNavigationBarItem(
-            index = 2, icon = R.drawable.instant_mix, label = "Alarm Settings",
+            index = 2, icon = R.drawable.instant_mix, label = "Alert Settings",
             selected = selected, onClick = onClick
         )
     }

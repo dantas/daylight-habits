@@ -13,10 +13,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.damiandantas.daylighthabits.ui.screen.AlarmScreen
+import com.damiandantas.daylighthabits.ui.screen.alert.AlertScreen
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 
-private const val ALARM = "alarm"
+private const val ALERT = "alert"
 private const val FORECAST = "forecast"
 private const val SETTINGS = "settings"
 
@@ -34,7 +34,7 @@ fun AppScreen() {
             bottomBar = {
                 AppNavigationBar(0) { index ->
                     when (index) {
-                        0 -> navController.navigate(ALARM)
+                        0 -> navController.navigate(ALERT)
                         1 -> navController.navigate(FORECAST)
                         2 -> navController.navigate(SETTINGS)
                     }
@@ -43,11 +43,11 @@ fun AppScreen() {
         ) { paddingValues ->
             NavHost(
                 navController = navController,
-                startDestination = ALARM,
+                startDestination = ALERT,
                 modifier = Modifier.padding(paddingValues)
             ) {
-                composable(ALARM) {
-                    AlarmScreen()
+                composable(ALERT) {
+                    AlertScreen()
                 }
                 composable(FORECAST) {
                     Text(text = "Forecast")

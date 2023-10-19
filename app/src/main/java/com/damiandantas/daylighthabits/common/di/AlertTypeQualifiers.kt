@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.di
+package com.damiandantas.daylighthabits.common.di
 
 import javax.inject.Qualifier
 

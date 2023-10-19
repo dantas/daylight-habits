@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "com.damiandantas.daylighthabits.system";
+option java_multiple_files = true;
+option optimize_for = LITE_RUNTIME;
+
+message AlertSchedulerProto {
+  bool is_scheduled = 1;
+}
