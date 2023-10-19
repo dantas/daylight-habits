@@ -12,7 +12,7 @@ import com.damiandantas.daylighthabits.alert.domain.AlertScheduler
 import com.damiandantas.daylighthabits.common.di.Sunrise
 import com.damiandantas.daylighthabits.common.di.Sunset
 import com.damiandantas.daylighthabits.common.suspendRunCatching
-import com.damiandantas.daylighthabits.data.AlertSchedulerProto
+import com.damiandantas.daylighthabits.proto.AlertSchedulerProto
 import com.google.protobuf.InvalidProtocolBufferException
 import dagger.Module
 import dagger.Provides
