@@ -2,21 +2,22 @@ package com.damiandantas.daylighthabits
 
 import android.app.Application
 import com.damiandantas.daylighthabits.modules.alert.domain.AlertRescheduler
-import com.damiandantas.daylighthabits.utils.di.DispatcherDefault
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp
-class MainApplication @Inject constructor(
-    private val rescheduler: AlertRescheduler,
-    @DispatcherDefault private val dispatcherDefault: CoroutineScope
-): Application() {
+class MainApplication : Application() {
+    @Inject
+    lateinit var rescheduler: AlertRescheduler
+
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
 
-        dispatcherDefault.launch {
+        GlobalScope.launch {
             rescheduler.reschedule()
         }
     }
