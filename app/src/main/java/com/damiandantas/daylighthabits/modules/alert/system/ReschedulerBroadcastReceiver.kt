@@ -5,20 +5,20 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.damiandantas.daylighthabits.modules.alert.domain.AlertRescheduler
+import com.damiandantas.daylighthabits.utils.di.DispatcherDefault
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReschedulerBroadcastReceiver @Inject constructor(
-    private val rescheduler: AlertRescheduler
+    private val rescheduler: AlertRescheduler,
+    @DispatcherDefault private val dispatcherDefault: CoroutineScope
 ) : BroadcastReceiver() {
-    @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent) {
-        GlobalScope.launch {
+        dispatcherDefault.launch {
             rescheduler.reschedule()
         }
     }
