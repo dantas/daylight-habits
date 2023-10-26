@@ -2,72 +2,53 @@ package com.damiandantas.daylighthabits.ui.screen.alert
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.damiandantas.daylighthabits.alert.domain.Alert
-import com.damiandantas.daylighthabits.alert.domain.AlertService
-import com.damiandantas.daylighthabits.alert.domain.createAlert
-import com.damiandantas.daylighthabits.common.di.Sunrise
-import com.damiandantas.daylighthabits.common.di.Sunset
-import com.damiandantas.daylighthabits.forecast.domain.forecast.UpcomingForecast
+import com.damiandantas.daylighthabits.alert.domain.SunMoment
+import com.damiandantas.daylighthabits.alert.domain.SunMomentService
+import com.damiandantas.daylighthabits.alert.domain.SunMomentType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Duration
-import java.time.ZonedDateTime
 import javax.inject.Inject
 
 @HiltViewModel
-class AlertScreenSunriseViewModel @Inject constructor(
-    @Sunrise alertService: AlertService,
-    private val upcomingForecast: UpcomingForecast,
-) : AlertScreenViewModel(
-    alertService = alertService,
-    forecast = { upcomingForecast.get().sunrise }
-)
-
-@HiltViewModel
-class AlertScreenSunsetViewModel @Inject constructor(
-    @Sunset alertService: AlertService,
-    private val upcomingForecast: UpcomingForecast,
-) : AlertScreenViewModel(
-    alertService = alertService,
-    forecast = { upcomingForecast.get().sunset }
-)
-
-data class AlertScreenCardState(
-    val sunTime: ZonedDateTime,
-    val isEnabled: Boolean,
-    val alert: Alert?,
-)
-
-open class AlertScreenViewModel(
-    private val alertService: AlertService,
-    private val forecast: suspend () -> ZonedDateTime
+class AlertScreenViewModel @Inject constructor(
+    private val momentService: SunMomentService
 ) : ViewModel() {
-    val cardState: StateFlow<AlertScreenCardState?> =
-        combine(
-            alertService.isEnabled,
-            alertService.alert
-        ) { isEnabled, alert ->
-            AlertScreenCardState(
-                forecast(),
-                isEnabled,
-                alert
-            )
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+    // TODO: momentService.moments it triggering multiple collections, use shareIn
 
-    fun setEnabled(enabled: Boolean) {
+    val sunrise: StateFlow<SunMoment?> =
+        momentService.moments.filter { it.type == SunMomentType.SUNRISE }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+
+    val sunset: StateFlow<SunMoment?> =
+        momentService.moments.filter { it.type == SunMomentType.SUNSET }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+
+    fun setSunriseEnabled(isEnabled: Boolean) {
         viewModelScope.launch {
-            alertService.setEnabled(enabled)
+            momentService.setEnabled(SunMomentType.SUNRISE, isEnabled)
         }
     }
 
-    fun setNoticeTime(duration: Duration) {
+    fun setSunsetEnabled(isEnabled: Boolean) {
         viewModelScope.launch {
-            val alert = forecast().createAlert(duration)
-            alertService.setAlert(alert)
+            momentService.setEnabled(SunMomentType.SUNSET, isEnabled)
+        }
+    }
+
+    fun setSunriseNoticePeriod(noticePeriod: Duration) {
+        viewModelScope.launch {
+            momentService.setNoticePeriod(SunMomentType.SUNRISE, noticePeriod)
+        }
+    }
+
+    fun setSunsetNoticePeriod(noticePeriod: Duration) {
+        viewModelScope.launch {
+            momentService.setNoticePeriod(SunMomentType.SUNSET, noticePeriod)
         }
     }
 }

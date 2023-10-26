@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,27 +41,29 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.alert.domain.Alert
+import com.damiandantas.daylighthabits.alert.domain.AlertConfig
+import com.damiandantas.daylighthabits.alert.domain.SunMoment
+import com.damiandantas.daylighthabits.alert.domain.SunMomentType
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import java.time.Duration
 import java.time.ZonedDateTime
 
 @Composable
 fun AlertScreen() {
-    val sunriseViewModel: AlertScreenSunriseViewModel = hiltViewModel()
-    val sunsetViewModel: AlertScreenSunsetViewModel = hiltViewModel()
+    val viewModel: AlertScreenViewModel = hiltViewModel()
 
     // TODO: Check how this composable is recomposed on state change
 
-    val sunriseCardState = sunriseViewModel.cardState.collectAsStateWithLifecycle().value
-    val sunsetCardState = sunsetViewModel.cardState.collectAsStateWithLifecycle().value
+    val sunrise: State<SunMoment?> = viewModel.sunrise.collectAsStateWithLifecycle()
+    val sunset: State<SunMoment?> = viewModel.sunset.collectAsStateWithLifecycle()
 
     ScreenContent(
-        sunriseCardState = sunriseCardState,
-        sunsetCardState = sunsetCardState,
-        onSunriseSetEnable = sunriseViewModel::setEnabled,
-        onSunriseSetNoticeTime = sunriseViewModel::setNoticeTime,
-        onSunsetSetEnable = sunsetViewModel::setEnabled,
-        onSunsetSetNoticeTime = sunsetViewModel::setNoticeTime,
+        sunrise = sunrise.value,
+        sunset = sunset.value,
+        onSunriseSetEnable = viewModel::setSunriseEnabled,
+        onSunriseSetNoticePeriod = viewModel::setSunriseNoticePeriod,
+        onSunsetSetEnable = viewModel::setSunsetEnabled,
+        onSunsetSetNoticePeriod = viewModel::setSunsetNoticePeriod,
     )
 }
 
@@ -69,78 +72,86 @@ fun AlertScreen() {
 fun AlertScreenPreview() {
     AppTheme {
         ScreenContent(
-            sunriseCardState = AlertScreenCardState(
-                ZonedDateTime.now(),
-                true,
-                Alert(
-                    ZonedDateTime.now().minusMinutes(8),
-                    Duration.ofMinutes(8)
+            sunrise = SunMoment(
+                type = SunMomentType.SUNRISE,
+                time = ZonedDateTime.now(),
+                alert = Alert(
+                    time = ZonedDateTime.now().minusMinutes(8),
+                    config = AlertConfig(
+                        type = SunMomentType.SUNRISE,
+                        noticePeriod = Duration.ofMinutes(8),
+                        isEnabled = true
+                    )
                 )
             ),
-            sunsetCardState = AlertScreenCardState(
-                ZonedDateTime.now(),
-                true,
-                Alert(
-                    ZonedDateTime.now().minusMinutes(15),
-                    Duration.ofMinutes(15)
+            sunset = SunMoment(
+                type = SunMomentType.SUNSET,
+                time = ZonedDateTime.now(),
+                alert = Alert(
+                    time = ZonedDateTime.now().minusMinutes(15),
+                    config = AlertConfig(
+                        type = SunMomentType.SUNSET,
+                        noticePeriod = Duration.ofMinutes(15),
+                        isEnabled = true
+                    )
                 )
             ),
             onSunriseSetEnable = {},
-            onSunriseSetNoticeTime = { _ -> },
+            onSunriseSetNoticePeriod = { _ -> },
             onSunsetSetEnable = {},
-            onSunsetSetNoticeTime = { _ -> },
+            onSunsetSetNoticePeriod = { _ -> },
         )
     }
 }
 
 @Composable
 private fun ScreenContent(
-    sunriseCardState: AlertScreenCardState?,
-    sunsetCardState: AlertScreenCardState?,
+    sunrise: SunMoment?,
+    sunset: SunMoment?,
     onSunriseSetEnable: (Boolean) -> Unit,
-    onSunriseSetNoticeTime: (Duration) -> Unit,
+    onSunriseSetNoticePeriod: (Duration) -> Unit,
     onSunsetSetEnable: (Boolean) -> Unit,
-    onSunsetSetNoticeTime: (Duration) -> Unit,
+    onSunsetSetNoticePeriod: (Duration) -> Unit,
 ) {
     Column {
         Card(
             cardResources = remember {
-                AlertScreenRes(
+                AlertScreenCardRes(
                     title = R.string.sunrise_card_title,
                     sunTime = R.string.sunrise_card_sun_time,
                     alertTime = R.string.sunrise_card_alert_time,
-                    noticeTime = R.string.sunrise_card_notice_time,
-                    setNoticeTime = R.string.sunrise_card_set_notice_time
+                    noticePeriod = R.string.sunrise_card_notice_time,
+                    setNoticePeriod = R.string.sunrise_card_set_notice_time
                 )
             },
-            cardState = sunriseCardState,
+            sunMoment = sunrise,
             onSetEnable = onSunriseSetEnable,
-            onSetNoticeTime = onSunriseSetNoticeTime
+            onSetNoticePeriod = onSunriseSetNoticePeriod
         )
 
         Card(
             cardResources = remember {
-                AlertScreenRes(
+                AlertScreenCardRes(
                     title = R.string.sunset_card_title,
                     sunTime = R.string.sunset_card_sun_time,
                     alertTime = R.string.sunset_card_alert_time,
-                    noticeTime = R.string.sunset_card_notice_time,
-                    setNoticeTime = R.string.sunset_card_set_notice_time
+                    noticePeriod = R.string.sunset_card_notice_time,
+                    setNoticePeriod = R.string.sunset_card_set_notice_time
                 )
             },
-            cardState = sunsetCardState,
+            sunMoment = sunset,
             onSetEnable = onSunsetSetEnable,
-            onSetNoticeTime = onSunsetSetNoticeTime
+            onSetNoticePeriod = onSunsetSetNoticePeriod
         )
     }
 }
 
 @Composable
 private fun Card(
-    cardResources: AlertScreenRes,
-    cardState: AlertScreenCardState?,
+    cardResources: AlertScreenCardRes,
+    sunMoment: SunMoment?,
     onSetEnable: (enabled: Boolean) -> Unit,
-    onSetNoticeTime: (Duration) -> Unit
+    onSetNoticePeriod: (Duration) -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier.padding(top = cardMargin, start = cardMargin, end = cardMargin)
@@ -150,14 +161,14 @@ private fun Card(
                 .fillMaxWidth()
                 .padding(all = cardPadding)
         ) {
-            if (cardState == null) {
+            if (sunMoment == null) {
                 CardWithoutState()
             } else {
                 CardWithState(
                     cardResources = cardResources,
-                    cardState = cardState,
+                    sunMoment = sunMoment,
                     onSetEnable = onSetEnable,
-                    onSetNoticeTime = onSetNoticeTime,
+                    onSetNoticePeriod = onSetNoticePeriod,
                 )
             }
         }
@@ -173,20 +184,21 @@ private fun BoxScope.CardWithoutState() {
 
 @Composable
 private fun BoxScope.CardWithState(
-    cardResources: AlertScreenRes,
-    cardState: AlertScreenCardState,
+    cardResources: AlertScreenCardRes,
+    sunMoment: SunMoment,
     onSetEnable: (enabled: Boolean) -> Unit,
-    onSetNoticeTime: (Duration) -> Unit
+    onSetNoticePeriod: (Duration) -> Unit
 ) {
-    var showSleepDurationDialog by rememberSaveable { mutableStateOf(false) }
+    var showNoticePeriodDialog by rememberSaveable { mutableStateOf(false) }
+
+    val hasAlert = sunMoment.alert != null
 
     FilledIconToggleButton(
-        checked = cardState.isEnabled,
+        checked = hasAlert,
         onCheckedChange = onSetEnable,
         modifier = Modifier.align(Alignment.CenterEnd)
     ) {
-        val icon =
-            if (cardState.isEnabled) R.drawable.alert_on else R.drawable.alert_off
+        val icon = if (hasAlert) R.drawable.alert_on else R.drawable.alert_off
         Icon(painterResource(id = icon), null)
     }
 
@@ -195,51 +207,53 @@ private fun BoxScope.CardWithState(
     ) {
         LabeledTime(
             title = stringResource(cardResources.sunTime),
-            hour = cardState.sunTime.hour,
-            minute = cardState.sunTime.minute
+            hour = sunMoment.time.hour,
+            minute = sunMoment.time.minute
         )
 
-        if (cardState.isEnabled) {
-            cardState.alert?.let { alert ->
-                LabeledTime(
-                    title = stringResource(cardResources.alertTime),
-                    hour = alert.time.hour,
-                    minute = alert.time.minute,
-                    modifier = Modifier.padding(top = cardPadding)
-                )
+        if (sunMoment.alert != null) {
+            val alert = sunMoment.alert
 
-                LabeledDuration(
-                    title = stringResource(cardResources.noticeTime),
-                    hour = alert.noticeTime.hours,
-                    minute = alert.noticeTime.minutes,
-                    modifier = Modifier.padding(top = cardPadding)
-                )
-            }
+            LabeledTime(
+                title = stringResource(cardResources.alertTime),
+                hour = alert.time.hour,
+                minute = alert.time.minute,
+                modifier = Modifier.padding(top = cardPadding)
+            )
+
+            LabeledDuration(
+                title = stringResource(cardResources.noticePeriod),
+                hour = alert.config.noticePeriod.hours,
+                minute = alert.config.noticePeriod.minutes,
+                modifier = Modifier.padding(top = cardPadding)
+            )
 
             Button(
                 onClick = {
-                    showSleepDurationDialog = true
+                    showNoticePeriodDialog = true
                 },
                 modifier = Modifier.padding(top = cardPadding)
             ) {
-                Text(stringResource(cardResources.setNoticeTime))
+                Text(stringResource(cardResources.setNoticePeriod))
             }
         }
 
-        if (showSleepDurationDialog) {
+        if (showNoticePeriodDialog) {
+            val noticePeriod = sunMoment.alert?.config?.noticePeriod ?: Duration.ZERO
+
             val dialog = TimePickerDialog(
                 LocalContext.current,
                 { _, hour: Int, minute: Int ->
                     val duration =
                         Duration.ofHours(hour.toLong()).plusMinutes(minute.toLong())
-                    onSetNoticeTime(duration)
-                    showSleepDurationDialog = false
+                    onSetNoticePeriod(duration)
+                    showNoticePeriodDialog = false
                 },
-                cardState.alert?.noticeTime?.hours ?: 0,
-                cardState.alert?.noticeTime?.minutes ?: 0,
+                noticePeriod.hours,
+                noticePeriod.minutes,
                 true
             )
-            dialog.setOnCancelListener { showSleepDurationDialog = false }
+            dialog.setOnCancelListener { showNoticePeriodDialog = false }
             dialog.show()
         }
     }
@@ -257,12 +271,12 @@ private val Duration.hours
 private val Duration.minutes
     get() = (toMinutes() % 60).toInt()
 
-private data class AlertScreenRes(
+private data class AlertScreenCardRes(
     @StringRes val title: Int,
     @StringRes val sunTime: Int,
     @StringRes val alertTime: Int,
-    @StringRes val noticeTime: Int,
-    @StringRes val setNoticeTime: Int,
+    @StringRes val noticePeriod: Int,
+    @StringRes val setNoticePeriod: Int,
 )
 
 @Composable

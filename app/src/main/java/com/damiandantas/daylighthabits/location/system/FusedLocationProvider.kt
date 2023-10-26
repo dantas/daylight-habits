@@ -1,9 +1,9 @@
-package com.damiandantas.daylighthabits.forecast.system
+package com.damiandantas.daylighthabits.location.system
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.damiandantas.daylighthabits.forecast.domain.Location
-import com.damiandantas.daylighthabits.forecast.domain.LocationProvider
+import com.damiandantas.daylighthabits.location.domain.Location
+import com.damiandantas.daylighthabits.location.domain.LocationProvider
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -33,6 +33,7 @@ interface LocationModule {
 
 @SuppressLint("MissingPermission")
 private suspend fun Context.getCurrentLocation(): Location = withContext(Dispatchers.IO) {
+    // TODO: Provide reusable instance?
     val client = LocationServices.getFusedLocationProviderClient(this@getCurrentLocation)
 
     val task = client.getCurrentLocation(

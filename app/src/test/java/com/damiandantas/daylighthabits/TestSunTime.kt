@@ -1,8 +1,8 @@
 package com.damiandantas.daylighthabits
 
-import com.damiandantas.daylighthabits.domain.Location
-import com.damiandantas.daylighthabits.domain.SunTime
-import com.damiandantas.daylighthabits.domain.calculateSunTime
+import com.damiandantas.daylighthabits.domain.Forecast
+import com.damiandantas.daylighthabits.domain.forecast.calculateSunForecast
+import com.damiandantas.daylighthabits.forecast.domain.forecast.Location
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.LocalDate
@@ -20,9 +20,9 @@ class TestSunTime {
         val zoneId = ZoneId.of("America/Sao_Paulo")
         val location = Location(-27.593947383922217, -48.5660607599406, 30.0)
 
-        val sut = calculateSunTime(location, localDate, zoneId)
+        val sut = calculateSunForecast(location, localDate, zoneId)
 
-        val expected = SunTime(
+        val expected = Forecast(
             ZonedDateTime.of(localDate, LocalTime.of(6, 54, 55), zoneId),
             ZonedDateTime.of(localDate, LocalTime.of(17, 48, 32), zoneId)
         )
@@ -31,15 +31,16 @@ class TestSunTime {
             expected, sut
         )
     }
+
     @Test
     fun sunTimeLondon() {
         val localDate = LocalDate.of(2023, 8, 3)
         val zoneId = ZoneId.of("Europe/London")
         val location = Location(51.507369358115945, -0.12775781095086025, 11.0)
 
-        val sut = calculateSunTime(location, localDate, zoneId)
+        val sut = calculateSunForecast(location, localDate, zoneId)
 
-        val expected = SunTime(
+        val expected = Forecast(
             ZonedDateTime.of(localDate, LocalTime.of(6, 54, 55), zoneId),
             ZonedDateTime.of(localDate, LocalTime.of(17, 48, 32), zoneId)
         )

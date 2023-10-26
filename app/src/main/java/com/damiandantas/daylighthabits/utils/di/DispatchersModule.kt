@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.common.di
+package com.damiandantas.daylighthabits.utils.di
 
 import dagger.Module
 import dagger.Provides

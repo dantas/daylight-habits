@@ -1,10 +1,9 @@
-package com.damiandantas.daylighthabits.forecast.domain.forecast
+package com.damiandantas.daylighthabits.forecast.domain
 
-import com.damiandantas.daylighthabits.forecast.domain.Location
+import com.damiandantas.daylighthabits.location.domain.Location
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import kotlin.math.acos
 import kotlin.math.asin
 import kotlin.math.cos
@@ -15,9 +14,6 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 // Code below is inspired by https://en.wikipedia.org/wiki/Sunrise_equation
-
-// TODO: Consider converting ZonedDateTime into a value class
-data class Forecast(val sunrise: ZonedDateTime, val sunset: ZonedDateTime)
 
 fun calculateForecast(location: Location, date: LocalDate, zone: ZoneId): Forecast {
     val julianDay = julianDay(date, zone)

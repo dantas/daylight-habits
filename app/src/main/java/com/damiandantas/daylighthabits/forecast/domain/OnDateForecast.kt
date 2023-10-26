@@ -1,7 +1,7 @@
-package com.damiandantas.daylighthabits.forecast.domain.forecast
+package com.damiandantas.daylighthabits.forecast.domain
 
-import com.damiandantas.daylighthabits.common.di.DispatcherDefault
-import com.damiandantas.daylighthabits.forecast.domain.LocationProvider
+import com.damiandantas.daylighthabits.location.domain.LocationProvider
+import com.damiandantas.daylighthabits.utils.di.DispatcherDefault
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

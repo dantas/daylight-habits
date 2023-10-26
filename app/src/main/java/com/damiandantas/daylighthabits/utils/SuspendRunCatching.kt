@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.common
+package com.damiandantas.daylighthabits.utils
 
 import java.util.concurrent.CancellationException
 

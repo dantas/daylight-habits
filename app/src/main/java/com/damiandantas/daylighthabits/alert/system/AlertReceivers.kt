@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.PendingIntentCompat
+import com.damiandantas.daylighthabits.alert.domain.SunMomentType
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -16,15 +17,6 @@ class SunriseAlertReceiver @Inject constructor() : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Log.i("wasd", "Sunrise alert")
     }
-
-    companion object {
-        fun pendingIntent(context: Context): PendingIntent {
-            val intent = Intent(context, SunriseAlertReceiver::class.java)
-            return PendingIntentCompat.getBroadcast(
-                context, 0, intent, 0, false
-            )
-        }
-    }
 }
 
 @AndroidEntryPoint
@@ -32,13 +24,15 @@ class SunsetAlertReceiver @Inject constructor() : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Log.i("wasd", "Sunset alert")
     }
+}
 
-    companion object {
-        fun pendingIntent(context: Context): PendingIntent {
-            val intent = Intent(context, SunsetAlertReceiver::class.java)
-            return PendingIntentCompat.getBroadcast(
-                context, 0, intent, 0, false
-            )
-        }
+fun Context.getPendingIntent(type: SunMomentType): PendingIntent {
+    val cls = when (type) {
+        SunMomentType.SUNRISE -> SunriseAlertReceiver::class.java
+        SunMomentType.SUNSET -> SunsetAlertReceiver::class.java
     }
+
+    return PendingIntentCompat.getBroadcast(
+        this, 0, Intent(this, cls), 0, false
+    )
 }
