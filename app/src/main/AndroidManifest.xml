@@ -30,7 +30,7 @@
         </activity>
 
         <receiver
-            android:name=".alert.system.ReschedulerBroadcastReceiver"
+            android:name=".modules.alert.system.ReschedulerBroadcastReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

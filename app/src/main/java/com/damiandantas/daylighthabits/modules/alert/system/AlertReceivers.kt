@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.alert.system
+package com.damiandantas.daylighthabits.modules.alert.system
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.PendingIntentCompat
-import com.damiandantas.daylighthabits.alert.domain.SunMomentType
+import com.damiandantas.daylighthabits.modules.SunMomentType
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

@@ -1,10 +1,10 @@
-package com.damiandantas.daylighthabits.alert.system
+package com.damiandantas.daylighthabits.modules.alert.system
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.damiandantas.daylighthabits.alert.domain.AlertRescheduler
+import com.damiandantas.daylighthabits.modules.alert.domain.AlertRescheduler
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope

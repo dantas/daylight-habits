@@ -2,9 +2,9 @@ package com.damiandantas.daylighthabits.ui.screen.alert
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.damiandantas.daylighthabits.alert.domain.SunMoment
-import com.damiandantas.daylighthabits.alert.domain.SunMomentService
-import com.damiandantas.daylighthabits.alert.domain.SunMomentType
+import com.damiandantas.daylighthabits.modules.SunMoment
+import com.damiandantas.daylighthabits.modules.SunMomentService
+import com.damiandantas.daylighthabits.modules.SunMomentType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

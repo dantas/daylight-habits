@@ -1,6 +1,10 @@
-package com.damiandantas.daylighthabits.alert.domain
+package com.damiandantas.daylighthabits.modules.alert.domain
 
-import com.damiandantas.daylighthabits.forecast.domain.UpcomingForecast
+import com.damiandantas.daylighthabits.modules.Alert
+import com.damiandantas.daylighthabits.modules.AlertConfig
+import com.damiandantas.daylighthabits.modules.SunMomentType
+import com.damiandantas.daylighthabits.modules.createAlert
+import com.damiandantas.daylighthabits.modules.forecast.domain.UpcomingForecast
 import javax.inject.Inject
 
 class AlertScheduler @Inject constructor(

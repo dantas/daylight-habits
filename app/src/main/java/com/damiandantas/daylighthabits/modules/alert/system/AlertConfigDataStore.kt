@@ -1,13 +1,13 @@
-package com.damiandantas.daylighthabits.alert.system
+package com.damiandantas.daylighthabits.modules.alert.system
 
 import android.content.Context
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
-import com.damiandantas.daylighthabits.alert.domain.AlertConfig
-import com.damiandantas.daylighthabits.alert.domain.AlertConfigRepository
-import com.damiandantas.daylighthabits.alert.domain.SunMomentType
+import com.damiandantas.daylighthabits.modules.AlertConfig
+import com.damiandantas.daylighthabits.modules.SunMomentType
+import com.damiandantas.daylighthabits.modules.alert.domain.AlertConfigRepository
 import com.damiandantas.daylighthabits.proto.AlertConfigProto
 import com.damiandantas.daylighthabits.proto.AlertConfigRepositoryProto
 import com.damiandantas.daylighthabits.utils.suspendRunCatching

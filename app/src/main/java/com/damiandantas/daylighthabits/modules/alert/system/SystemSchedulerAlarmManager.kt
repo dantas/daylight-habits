@@ -1,10 +1,10 @@
-package com.damiandantas.daylighthabits.alert.system
+package com.damiandantas.daylighthabits.modules.alert.system
 
 import android.app.AlarmManager
 import android.content.Context
-import com.damiandantas.daylighthabits.alert.domain.Alert
-import com.damiandantas.daylighthabits.alert.domain.SunMomentType
-import com.damiandantas.daylighthabits.alert.domain.SystemScheduler
+import com.damiandantas.daylighthabits.modules.Alert
+import com.damiandantas.daylighthabits.modules.SunMomentType
+import com.damiandantas.daylighthabits.modules.alert.domain.SystemScheduler
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

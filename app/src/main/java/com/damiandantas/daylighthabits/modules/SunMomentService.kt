@@ -1,6 +1,9 @@
-package com.damiandantas.daylighthabits.alert.domain
+package com.damiandantas.daylighthabits.modules
 
-import com.damiandantas.daylighthabits.forecast.domain.UpcomingForecast
+import com.damiandantas.daylighthabits.modules.alert.domain.AlertConfigRepository
+import com.damiandantas.daylighthabits.modules.alert.domain.AlertScheduler
+import com.damiandantas.daylighthabits.modules.alert.domain.loadOrDefault
+import com.damiandantas.daylighthabits.modules.forecast.domain.UpcomingForecast
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.time.Duration

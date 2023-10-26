@@ -40,10 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.damiandantas.daylighthabits.R
-import com.damiandantas.daylighthabits.alert.domain.Alert
-import com.damiandantas.daylighthabits.alert.domain.AlertConfig
-import com.damiandantas.daylighthabits.alert.domain.SunMoment
-import com.damiandantas.daylighthabits.alert.domain.SunMomentType
+import com.damiandantas.daylighthabits.modules.Alert
+import com.damiandantas.daylighthabits.modules.AlertConfig
+import com.damiandantas.daylighthabits.modules.SunMoment
+import com.damiandantas.daylighthabits.modules.SunMomentType
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import java.time.Duration
 import java.time.ZonedDateTime

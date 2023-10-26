@@ -1,9 +1,9 @@
-package com.damiandantas.daylighthabits.location.system
+package com.damiandantas.daylighthabits.modules.location.system
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.damiandantas.daylighthabits.location.domain.Location
-import com.damiandantas.daylighthabits.location.domain.LocationProvider
+import com.damiandantas.daylighthabits.modules.location.domain.Location
+import com.damiandantas.daylighthabits.modules.location.domain.LocationProvider
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource

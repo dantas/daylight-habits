@@ -1,6 +1,7 @@
-package com.damiandantas.daylighthabits.forecast.domain
+package com.damiandantas.daylighthabits.modules.forecast.domain
 
-import com.damiandantas.daylighthabits.location.domain.Location
+import com.damiandantas.daylighthabits.modules.Forecast
+import com.damiandantas.daylighthabits.modules.location.domain.Location
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId

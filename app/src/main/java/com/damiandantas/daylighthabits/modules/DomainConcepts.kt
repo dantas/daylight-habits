@@ -1,6 +1,5 @@
-package com.damiandantas.daylighthabits.alert.domain
+package com.damiandantas.daylighthabits.modules
 
-import com.damiandantas.daylighthabits.forecast.domain.Forecast
 import java.time.Duration
 import java.time.ZonedDateTime
 
@@ -26,6 +25,8 @@ data class AlertConfig(
 ) {
     constructor(type: SunMomentType) : this(type, Duration.ZERO, false)
 }
+
+data class Forecast(val sunrise: ZonedDateTime, val sunset: ZonedDateTime)
 
 fun Forecast.createAlert(config: AlertConfig): Alert? {
     if (!config.isEnabled) return null

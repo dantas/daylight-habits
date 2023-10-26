@@ -1,5 +1,7 @@
-package com.damiandantas.daylighthabits.alert.domain
+package com.damiandantas.daylighthabits.modules.alert.domain
 
+import com.damiandantas.daylighthabits.modules.AlertConfig
+import com.damiandantas.daylighthabits.modules.SunMomentType
 import kotlinx.coroutines.flow.Flow
 
 interface AlertConfigRepository {
