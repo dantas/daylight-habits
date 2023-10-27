@@ -20,15 +20,11 @@ class SystemSchedulerAlarmManager @Inject constructor(
     override suspend fun schedule(alert: Alert) = withContext(Dispatchers.IO) {
         val pendingIntent = context.getPendingIntent(alert.config.type)
 
-        try {
-            context.alarmManager.setExact(
-                AlarmManager.RTC_WAKEUP,
-                alert.time.toEpochSecond() * 1000L,
-                pendingIntent
-            )
-        } catch (e: SecurityException) {
-            // TODO: Suppress error?
-        }
+        context.alarmManager.setExact(
+            AlarmManager.RTC_WAKEUP,
+            alert.time.toEpochSecond() * 1000L,
+            pendingIntent
+        )
     }
 
     override suspend fun unschedule(type: SunMomentType) {
