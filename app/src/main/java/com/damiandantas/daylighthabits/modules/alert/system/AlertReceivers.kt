@@ -34,5 +34,5 @@ fun Context.getPendingIntent(type: SunMomentType): PendingIntent {
 
     return PendingIntentCompat.getBroadcast(
         this, 0, Intent(this, cls), 0, false
-    )
+    )!!
 }
