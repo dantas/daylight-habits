@@ -2,10 +2,9 @@ package com.damiandantas.daylighthabits.modules
 
 import com.damiandantas.daylighthabits.modules.alert.domain.AlertConfigRepository
 import com.damiandantas.daylighthabits.modules.alert.domain.AlertScheduler
-import com.damiandantas.daylighthabits.modules.alert.domain.loadOrDefault
 import com.damiandantas.daylighthabits.modules.forecast.domain.UpcomingForecast
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import java.time.Duration
 import javax.inject.Inject
 
@@ -14,32 +13,14 @@ class SunMomentService @Inject constructor(
     private val repository: AlertConfigRepository,
     private val domainScheduler: AlertScheduler
 ) {
-    val moments: Flow<SunMoment> = flow {
+    val moments: Flow<SunMoment> = repository.configs.map { config ->
         val forecast = upcomingForecast.get()
 
-        for (type in SunMomentType.values()) {
-            val config = repository.loadOrDefault(type).getOrThrow() // TODO: Fix error
-
-            val moment = SunMoment(
-                type = type,
-                time = forecast.getTime(config.type),
-                alert = forecast.createAlert(config)
-            )
-
-            emit(moment)
-        }
-
-        repository.configs.collect { config ->
-            val forecast = upcomingForecast.get()
-
-            val moment = SunMoment(
-                type = config.type,
-                time = forecast.getTime(config.type),
-                alert = forecast.createAlert(config)
-            )
-
-            emit(moment)
-        }
+        SunMoment(
+            type = config.type,
+            time = forecast.getTime(config.type),
+            alert = forecast.createAlert(config)
+        )
     }
 
     suspend fun setEnabled(type: SunMomentType, isEnabled: Boolean) {
@@ -56,7 +37,7 @@ class SunMomentService @Inject constructor(
         type: SunMomentType,
         block: (oldConfig: AlertConfig) -> AlertConfig
     ): AlertConfig {
-        val oldConfig = repository.loadOrDefault(type).getOrThrow() // TODO: Deal with error
+        val oldConfig = repository.load(type).getOrThrow() // TODO: Deal with error
 
         val newConfig = block(oldConfig)
 

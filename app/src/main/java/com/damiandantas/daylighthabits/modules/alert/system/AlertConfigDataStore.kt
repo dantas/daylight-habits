@@ -32,15 +32,8 @@ class AlertConfigDataStore @Inject constructor(
 
     override val configs: Flow<AlertConfig> = flow {
         dataStore.data.collect { repositoryProto ->
-            if (repositoryProto.hasSunrise) {
-                val config = repositoryProto.sunrise.toAlertConfig(SunMomentType.SUNRISE)
-                emit(config)
-            }
-
-            if (repositoryProto.hasSunset) {
-                val config = repositoryProto.sunset.toAlertConfig(SunMomentType.SUNSET)
-                emit(config)
-            }
+            emit(repositoryProto.sunriseAlertConfig)
+            emit(repositoryProto.sunsetAlertConfig)
         }
     }
 
@@ -64,28 +57,29 @@ class AlertConfigDataStore @Inject constructor(
         }
     }
 
-    override suspend fun load(type: SunMomentType): Result<AlertConfig?> = suspendRunCatching {
+    override suspend fun load(type: SunMomentType): Result<AlertConfig> = suspendRunCatching {
         val repositoryProto = dataStore.data.first()
 
         when (type) {
-            SunMomentType.SUNRISE -> {
-                if (repositoryProto.hasSunrise) {
-                    repositoryProto.sunrise.toAlertConfig(type)
-                } else {
-                    null
-                }
-            }
-
-            SunMomentType.SUNSET -> {
-                if (repositoryProto.hasSunset) {
-                    repositoryProto.sunset.toAlertConfig(type)
-                } else {
-                    null
-                }
-            }
+            SunMomentType.SUNRISE -> repositoryProto.sunriseAlertConfig
+            SunMomentType.SUNSET -> repositoryProto.sunsetAlertConfig
         }
     }
 }
+
+private val AlertConfigRepositoryProto.sunriseAlertConfig: AlertConfig
+    get() = if (hasSunrise) {
+        sunrise.toAlertConfig(SunMomentType.SUNRISE)
+    } else {
+        AlertConfig(SunMomentType.SUNRISE)
+    }
+
+private val AlertConfigRepositoryProto.sunsetAlertConfig: AlertConfig
+    get() = if (hasSunset) {
+        sunset.toAlertConfig(SunMomentType.SUNSET)
+    } else {
+        AlertConfig(SunMomentType.SUNSET)
+    }
 
 private fun AlertConfigProto.toAlertConfig(type: SunMomentType): AlertConfig =
     AlertConfig(

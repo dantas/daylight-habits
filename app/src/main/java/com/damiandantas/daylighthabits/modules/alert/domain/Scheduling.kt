@@ -33,8 +33,7 @@ class AlertRescheduler @Inject constructor(
 ) {
     suspend fun reschedule() {
         for (type in SunMomentType.values()) {
-            val config =
-                repository.loadOrDefault(type).getOrNull() ?: continue // TODO: Deal with error
+            val config = repository.load(type).getOrNull() ?: continue
             domainScheduler.setSchedule(config)
         }
     }
