@@ -2,6 +2,7 @@ package com.damiandantas.daylighthabits
 
 import android.app.Application
 import com.damiandantas.daylighthabits.modules.alert.domain.AlertRescheduler
+import com.damiandantas.daylighthabits.utils.hasLocationPermission
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -18,7 +19,7 @@ class MainApplication : Application() {
         super.onCreate()
 
         GlobalScope.launch {
-            rescheduler.reschedule()
+            if (hasLocationPermission()) rescheduler.reschedule()
         }
     }
 }

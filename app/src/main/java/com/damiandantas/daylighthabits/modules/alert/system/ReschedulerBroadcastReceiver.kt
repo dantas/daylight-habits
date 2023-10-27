@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.damiandantas.daylighthabits.modules.alert.domain.AlertRescheduler
+import com.damiandantas.daylighthabits.utils.hasLocationPermission
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -19,7 +20,7 @@ class ReschedulerBroadcastReceiver @Inject constructor(
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent) {
         GlobalScope.launch {
-            rescheduler.reschedule()
+            if (context.hasLocationPermission()) rescheduler.reschedule()
         }
     }
 }
