@@ -78,7 +78,7 @@ private val DarkColors = darkColorScheme(
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
     val dynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
@@ -91,6 +91,9 @@ fun AppTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        content = content
+        content = {
+            ColorSystemUi()
+            content()
+        }
     )
 }

@@ -15,7 +15,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.damiandantas.daylighthabits.ui.screen.alert.AlertScreen
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
-import com.damiandantas.daylighthabits.ui.theme.ColorSystemUi
 
 private const val ALERT = "alert"
 private const val FORECAST = "forecast"
@@ -26,46 +25,44 @@ private const val SETTINGS = "settings"
 fun AppScreen() {
     val navController = rememberNavController()
 
-    Surface(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        ColorSystemUi()
-
-        Scaffold(
-            bottomBar = {
-                AppNavigationBar(0) { index ->
-                    when (index) {
-                        0 -> navController.navigate(ALERT)
-                        1 -> navController.navigate(FORECAST)
-                        2 -> navController.navigate(SETTINGS)
-                    }
+    Scaffold(
+        bottomBar = {
+            AppNavigationBar(0) { index ->
+                when (index) {
+                    0 -> navController.navigate(ALERT)
+                    1 -> navController.navigate(FORECAST)
+                    2 -> navController.navigate(SETTINGS)
                 }
-            },
-        ) { paddingValues ->
-            NavHost(
-                navController = navController,
-                startDestination = ALERT,
-                modifier = Modifier.padding(paddingValues)
-            ) {
-                composable(ALERT) {
-                    AlertScreen()
-                }
-                composable(FORECAST) {
-                    Text(text = "Forecast")
-                }
-                composable(SETTINGS) {
-                    Text(text = "Settings")
-                }
+            }
+        },
+    ) { paddingValues ->
+        NavHost(
+            navController = navController,
+            startDestination = ALERT,
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            composable(ALERT) {
+                AlertScreen()
+            }
+            composable(FORECAST) {
+                Text(text = "Forecast")
+            }
+            composable(SETTINGS) {
+                Text(text = "Settings")
             }
         }
     }
 }
 
 @Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun AppScreenPreview() {
     AppTheme {
-        AppScreen()
+        Surface(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            AppScreen()
+        }
     }
 }
