@@ -5,12 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.damiandantas.daylighthabits.ui.app.AppScreen
 import com.damiandantas.daylighthabits.ui.dialog.LocationPermissionDialog
@@ -38,20 +35,16 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    if (hasLocationPermission) {
-                        AppScreen()
-                    } else {
-                        LocationPermissionDialog(
-                            onDismissDialog = {
-                                finish()
-                            }, onClickButton = {
-                                activityResult.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-                            }
-                        )
-                    }
+                if (hasLocationPermission) {
+                    AppScreen()
+                } else {
+                    LocationPermissionDialog(
+                        onDismissDialog = {
+                            finish()
+                        }, onClickButton = {
+                            activityResult.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        }
+                    )
                 }
             }
         }

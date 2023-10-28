@@ -96,7 +96,12 @@ fun AppTheme(
         colorScheme = colorScheme,
         content = {
             ColorSystemUi()
-            content()
+
+            Surface(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                content()
+            }
         }
     )
 }
