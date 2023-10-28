@@ -8,7 +8,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,7 +17,7 @@ import com.damiandantas.daylighthabits.ui.theme.AppThemePreview
 
 @Composable
 fun AppNavigationBar(selectedItem: Int, onClick: (index: Int) -> Unit) {
-    val selected = rememberSaveable { mutableStateOf(selectedItem) }
+    val selected = rememberSaveable { mutableIntStateOf(selectedItem) }
 
     NavigationBar {
         AppNavigationBarItem(
