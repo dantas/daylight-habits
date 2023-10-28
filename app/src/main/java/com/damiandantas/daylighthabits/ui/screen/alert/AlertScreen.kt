@@ -44,7 +44,7 @@ import com.damiandantas.daylighthabits.modules.Alert
 import com.damiandantas.daylighthabits.modules.AlertConfig
 import com.damiandantas.daylighthabits.modules.SunMoment
 import com.damiandantas.daylighthabits.modules.SunMomentType
-import com.damiandantas.daylighthabits.ui.theme.AppTheme
+import com.damiandantas.daylighthabits.ui.theme.AppThemePreview
 import java.time.Duration
 import java.time.ZonedDateTime
 
@@ -70,7 +70,7 @@ fun AlertScreen() {
 @Composable
 @Preview(showSystemUi = true)
 fun AlertScreenPreview() {
-    AppTheme {
+    AppThemePreview {
         ScreenContent(
             sunrise = SunMoment(
                 type = SunMomentType.SUNRISE,

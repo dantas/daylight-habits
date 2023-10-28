@@ -1,11 +1,9 @@
 package com.damiandantas.daylighthabits.ui.app
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.damiandantas.daylighthabits.ui.screen.alert.AlertScreen
-import com.damiandantas.daylighthabits.ui.theme.AppTheme
+import com.damiandantas.daylighthabits.ui.theme.AppThemePreview
 
 private const val ALERT = "alert"
 private const val FORECAST = "forecast"
@@ -58,11 +56,7 @@ fun AppScreen() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun AppScreenPreview() {
-    AppTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            AppScreen()
-        }
+    AppThemePreview {
+        AppScreen()
     }
 }
