@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.ui.dialog
+package com.damiandantas.daylighthabits.ui.composable.dialog
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -54,6 +54,6 @@ fun LocationPermissionDialog(onDismissDialog: () -> Unit, onClickButton: () -> U
 @Preview(showSystemUi = true)
 private fun LocationPermissionDialogPreview() {
     AppThemePreview {
-        LocationPermissionDialog({}, {})
+        LocationPermissionDialog(onDismissDialog = {}, onClickButton = {})
     }
 }

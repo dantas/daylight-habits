@@ -10,7 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import com.damiandantas.daylighthabits.ui.app.AppScreen
-import com.damiandantas.daylighthabits.ui.dialog.LocationPermissionDialog
+import com.damiandantas.daylighthabits.ui.composable.dialog.LocationPermissionDialog
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import com.damiandantas.daylighthabits.utils.hasLocationPermission
 import dagger.hilt.android.AndroidEntryPoint
