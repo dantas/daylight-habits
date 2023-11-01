@@ -26,13 +26,23 @@ class SunsetAlertReceiver @Inject constructor() : BroadcastReceiver() {
     }
 }
 
-fun Context.getPendingIntent(type: SunMomentType): PendingIntent {
-    val cls = when (type) {
-        SunMomentType.SUNRISE -> SunriseAlertReceiver::class.java
-        SunMomentType.SUNSET -> SunsetAlertReceiver::class.java
-    }
-
-    return PendingIntentCompat.getBroadcast(
-        this, 0, Intent(this, cls), 0, false
+fun scheduleAlertIntent(context: Context, type: SunMomentType): PendingIntent =
+    PendingIntentCompat.getBroadcast(
+        context, 0, receiverIntent(context, type), 0, false
     )!!
-}
+
+fun unscheduleAlertIntent(context: Context, type: SunMomentType): PendingIntent? =
+    PendingIntentCompat.getBroadcast(
+        context, 0,
+        receiverIntent(context, type),
+        PendingIntent.FLAG_NO_CREATE, false
+    )
+
+private fun receiverIntent(context: Context, type: SunMomentType): Intent =
+    Intent(
+        context,
+        when (type) {
+            SunMomentType.SUNRISE -> SunriseAlertReceiver::class.java
+            SunMomentType.SUNSET -> SunsetAlertReceiver::class.java
+        }
+    )

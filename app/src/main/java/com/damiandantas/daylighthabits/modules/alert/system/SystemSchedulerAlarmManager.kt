@@ -18,7 +18,7 @@ class SystemSchedulerAlarmManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) : SystemScheduler {
     override suspend fun schedule(alert: Alert) = withContext(Dispatchers.IO) {
-        val pendingIntent = context.getPendingIntent(alert.config.type)
+        val pendingIntent = scheduleAlertIntent(context, alert.config.type)
 
         context.alarmManager.setExact(
             AlarmManager.RTC_WAKEUP,
@@ -28,7 +28,7 @@ class SystemSchedulerAlarmManager @Inject constructor(
     }
 
     override suspend fun unschedule(type: SunMomentType) {
-        val pendingIntent = context.getPendingIntent(type)
+        val pendingIntent = unscheduleAlertIntent(context, type) ?: return
 
         context.alarmManager.cancel(pendingIntent)
     }
