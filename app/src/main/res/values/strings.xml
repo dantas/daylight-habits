@@ -13,6 +13,10 @@
     <string name="sunset_card_notice_time">Time to go outside</string>
     <string name="sunset_card_set_notice_time">Set timer</string>
 
+    <string name="location_permission_dialog_title">Coarse location required</string>
+    <string name="location_permission_dialog_explanation">We require your coarse location to calculate the sunrise and sunset\nThis location does not leave your device\nClicking on Proceed will take you to another screen to authorize it</string>
+    <string name="location_permission_dialog_button">Proceed</string>
+
     <plurals name="hour">
         <item quantity="one">hour</item>
         <item quantity="other">hours</item>
