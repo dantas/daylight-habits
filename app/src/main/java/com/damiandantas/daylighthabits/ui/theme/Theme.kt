@@ -79,7 +79,7 @@ fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    // TODO: Enable at a later date
+    // TODO: Enable at a later date, perhaps use LocalInspectionMode.current
     val useDynamicColor = false//Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
     val colorScheme = when {
