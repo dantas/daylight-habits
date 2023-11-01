@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.damiandantas.daylighthabits.R
-import com.damiandantas.daylighthabits.ui.theme.AppThemePreview
+import com.damiandantas.daylighthabits.ui.theme.AppTheme
 
 private const val button = "Proceed"
 
@@ -53,7 +53,7 @@ fun LocationPermissionDialog(onDismissDialog: () -> Unit, onClickButton: () -> U
 @Composable
 @Preview(showSystemUi = true)
 private fun LocationPermissionDialogPreview() {
-    AppThemePreview {
+    AppTheme {
         LocationPermissionDialog(onDismissDialog = {}, onClickButton = {})
     }
 }

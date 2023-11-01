@@ -12,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.damiandantas.daylighthabits.ui.screen.alert.AlertScreen
-import com.damiandantas.daylighthabits.ui.theme.AppThemePreview
+import com.damiandantas.daylighthabits.ui.theme.AppTheme
 
 private const val ALERT = "alert"
 private const val FORECAST = "forecast"
@@ -56,7 +56,7 @@ fun AppScreen() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun AppScreenPreview() {
-    AppThemePreview {
+    AppTheme {
         AppScreen()
     }
 }

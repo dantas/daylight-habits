@@ -13,7 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.damiandantas.daylighthabits.R
-import com.damiandantas.daylighthabits.ui.theme.AppThemePreview
+import com.damiandantas.daylighthabits.ui.theme.AppTheme
 
 @Composable
 fun AppNavigationBar(selectedItem: Int, onClick: (index: Int) -> Unit) {
@@ -58,7 +58,7 @@ fun RowScope.AppNavigationBarItem(
 @Composable
 @Preview
 private fun NavigationBarPreview() {
-    AppThemePreview(fullScreen = false) {
+    AppTheme {
         AppNavigationBar(0) {}
     }
 }

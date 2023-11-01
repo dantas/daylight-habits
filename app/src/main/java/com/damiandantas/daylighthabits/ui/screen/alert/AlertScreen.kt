@@ -70,7 +70,7 @@ fun AlertScreen() {
 @Composable
 @Preview(showSystemUi = true)
 fun AlertScreenPreview() {
-    AppThemePreview {
+    AppTheme {
         ScreenContent(
             sunrise = SunMoment(
                 type = SunMomentType.SUNRISE,

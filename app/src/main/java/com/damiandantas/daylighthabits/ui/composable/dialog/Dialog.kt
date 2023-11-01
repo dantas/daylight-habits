@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.damiandantas.daylighthabits.ui.theme.AppThemePreview
+import com.damiandantas.daylighthabits.ui.theme.AppTheme
 
 private val contentPadding = PaddingValues(24.dp)
 
@@ -33,7 +33,7 @@ fun AppDialog(
 @Preview(showSystemUi = true)
 @Composable
 private fun AppDialogPreview() {
-    AppThemePreview {
+    AppTheme {
         AppDialog(onDismissRequest = {}) { paddingValues ->
             Text("Hello Dialog", modifier = Modifier.padding(paddingValues))
         }
