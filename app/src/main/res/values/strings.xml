@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Daylight Habits</string>
 
+    <string name="nav_bar_alert">Alert</string>
+    <string name="nav_bar_forecast">Forecast</string>
+    <string name="nav_bar_settings">Alert Settings</string>
+
     <string name="sunrise_card_title">Sunrise</string>
     <string name="sunrise_card_sun_time">Sunrise time</string>
     <string name="sunrise_card_alert_time">Sleep time</string>

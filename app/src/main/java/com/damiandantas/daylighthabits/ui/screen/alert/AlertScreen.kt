@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.damiandantas.daylighthabits.ui.screen.alert
 
 import DurationPicker
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -28,7 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.modules.Alert
@@ -42,9 +38,7 @@ import java.time.Duration
 import java.time.ZonedDateTime
 
 @Composable
-fun AlertScreen() {
-    val viewModel: AlertScreenViewModel = hiltViewModel()
-
+fun AlertScreen(viewModel: AlertScreenViewModel) {
     // TODO: Check how this composable is recomposed on state change
 
     val sunrise: State<SunMoment?> = viewModel.sunrise.collectAsStateWithLifecycle()
