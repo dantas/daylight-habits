@@ -77,7 +77,7 @@ protobuf {
 dependencies {
     // Compose
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00")) // Bill of Materials
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01")) // Bill of Materials
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.activity:activity-compose:1.8.0")
@@ -88,7 +88,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00")) // Bill of Materials
+    implementation(platform("androidx.compose:compose-bom:2023.10.01")) // Bill of Materials
 
     // Tests
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
