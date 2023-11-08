@@ -3,7 +3,6 @@ package com.damiandantas.daylighthabits.ui
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -60,7 +59,6 @@ private enum class Screen(
 
 private val startDestination = Screen.Alert
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScreen() {
     val navController = rememberNavController()
@@ -75,7 +73,15 @@ fun AppScreen() {
                         currentBackStack.value?.destination?.route ?: startDestination.route
                     }
                 },
-                onSelected = { navController.navigate(it.route) }
+                onSelected = { screen ->
+                    navController.navigate(screen.route) {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(startDestination.route) {
+                            saveState = true
+                        }
+                    }
+                }
             )
         },
     ) { paddingValues ->
