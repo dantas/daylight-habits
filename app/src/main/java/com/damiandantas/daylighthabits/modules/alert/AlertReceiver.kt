@@ -12,16 +12,9 @@ import javax.inject.Inject
 // TODO: Replace BroadcastReceiver with Activity
 
 @AndroidEntryPoint
-class SunriseAlertReceiver @Inject constructor() : BroadcastReceiver() {
+class AlertReceiver @Inject constructor() : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        Log.i("wasd", "Sunrise alert")
-    }
-}
-
-@AndroidEntryPoint
-class SunsetAlertReceiver @Inject constructor() : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-        Log.i("wasd", "Sunset alert")
+        Log.i("wasd", "Alert ${getAlertType(intent)}")
     }
 }
 
@@ -37,11 +30,20 @@ fun unscheduleAlertIntent(context: Context, type: AlertType): PendingIntent? =
         PendingIntent.FLAG_NO_CREATE, false
     )
 
+private const val TYPE = "type"
+
+/*
+        Since scheduled alarms are lost when the app is reinstalled, we can use AlertType.name
+    without worrying about refactoring that changes the enum names
+ */
 private fun receiverIntent(context: Context, type: AlertType): Intent =
     Intent(
         context,
-        when (type) {
-            AlertType.SUNRISE -> SunriseAlertReceiver::class.java
-            AlertType.SUNSET -> SunsetAlertReceiver::class.java
-        }
-    )
+        AlertReceiver::class.java
+    ).apply {
+        putExtra(TYPE, type.name)
+    }
+
+private fun getAlertType(intent: Intent): AlertType? =
+    runCatching { AlertType.valueOf(intent.getStringExtra(TYPE) ?: "") }.getOrNull()
+
