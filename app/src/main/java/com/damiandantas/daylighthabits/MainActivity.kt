@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.damiandantas.daylighthabits.ui.AppScreen
 import com.damiandantas.daylighthabits.ui.composable.LocationPermissionDialog
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
@@ -22,11 +23,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        var showSplashScreen by mutableStateOf(true)
+
+        installSplashScreen().setKeepOnScreenCondition {
+            showSplashScreen
+        }
+
         setContent {
             var showAppScreen by remember { mutableStateOf(false) }
 
             LaunchedEffect(this) {
                 showAppScreen = hasLocationPermission()
+                showSplashScreen = false
             }
 
             val launcher =
