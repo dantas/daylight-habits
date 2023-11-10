@@ -1,10 +1,10 @@
-package com.damiandantas.daylighthabits.modules.forecast.domain
+package com.damiandantas.daylighthabits.modules.forecast
 
-import com.damiandantas.daylighthabits.modules.Forecast
-import com.damiandantas.daylighthabits.modules.location.domain.Location
+import com.damiandantas.daylighthabits.modules.Location
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import kotlin.math.acos
 import kotlin.math.asin
 import kotlin.math.cos
@@ -15,6 +15,8 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 // Code below is inspired by https://en.wikipedia.org/wiki/Sunrise_equation
+
+data class Forecast(val sunrise: ZonedDateTime, val sunset: ZonedDateTime)
 
 fun calculateForecast(location: Location, date: LocalDate, zone: ZoneId): Forecast {
     val julianDay = julianDay(date, zone)
@@ -36,9 +38,9 @@ fun calculateForecast(location: Location, date: LocalDate, zone: ZoneId): Foreca
 }
 
 @JvmInline
-value class JulianDay(val value: Double)
+private value class JulianDay(val value: Double)
 
-private inline fun julianDay(date: LocalDate, zone: ZoneId): JulianDay {
+private fun julianDay(date: LocalDate, zone: ZoneId): JulianDay {
     val epochSecond = date.atStartOfDay(zone).toEpochSecond()
     val julianDate = epochSecond / 86400.0 + 2440587.5
     return JulianDay(
@@ -47,23 +49,23 @@ private inline fun julianDay(date: LocalDate, zone: ZoneId): JulianDay {
 }
 
 @JvmInline
-value class MeanSolarTime(val value: Double)
+private value class MeanSolarTime(val value: Double)
 
-private inline fun meanSolarTime(julianDay: JulianDay, location: Location): MeanSolarTime =
+private fun meanSolarTime(julianDay: JulianDay, location: Location): MeanSolarTime =
     MeanSolarTime(julianDay.value + 0.0009 - location.longitude / 360.0)
 
-data class SolarMeanAnomaly(val degrees: Double, val radians: Double)
+private data class SolarMeanAnomaly(val degrees: Double, val radians: Double)
 
-private inline fun solarMeanAnomaly(meanSolarTime: MeanSolarTime): SolarMeanAnomaly {
+private fun solarMeanAnomaly(meanSolarTime: MeanSolarTime): SolarMeanAnomaly {
     val degrees = (357.5291 + 0.98560028 * meanSolarTime.value) % 360
     val radians = Math.toRadians(degrees)
     return SolarMeanAnomaly(degrees, radians)
 }
 
 @JvmInline
-value class EquationOfCenter(val value: Double)
+private value class EquationOfCenter(val value: Double)
 
-private inline fun equationOfCenter(solarMeanAnomaly: SolarMeanAnomaly): EquationOfCenter =
+private fun equationOfCenter(solarMeanAnomaly: SolarMeanAnomaly): EquationOfCenter =
     EquationOfCenter(
         1.9148 * sin(solarMeanAnomaly.radians) + 0.02 * sin(2 * solarMeanAnomaly.radians) + 0.0003 * sin(
             3 * solarMeanAnomaly.radians
@@ -71,9 +73,9 @@ private inline fun equationOfCenter(solarMeanAnomaly: SolarMeanAnomaly): Equatio
     )
 
 @JvmInline
-value class EclipticLongitude(val value: Double)
+private value class EclipticLongitude(val value: Double)
 
-private inline fun eclipticLongitude(
+private fun eclipticLongitude(
     solarMeanAnomaly: SolarMeanAnomaly,
     equationOfCenter: EquationOfCenter
 ): EclipticLongitude {
@@ -82,9 +84,9 @@ private inline fun eclipticLongitude(
 }
 
 @JvmInline
-value class SolarTransit(val value: Double)
+private value class SolarTransit(val value: Double)
 
-private inline fun solarTransit(
+private fun solarTransit(
     meanSolarTime: MeanSolarTime,
     solarMeanAnomaly: SolarMeanAnomaly,
     eclipticLongitude: EclipticLongitude
@@ -93,18 +95,18 @@ private inline fun solarTransit(
         2451545.0 + meanSolarTime.value + 0.0053 * sin(solarMeanAnomaly.radians) - 0.0069 * sin(2 * eclipticLongitude.value)
     )
 
-data class DeclinationOfSun(val sin: Double, val cos: Double)
+private data class DeclinationOfSun(val sin: Double, val cos: Double)
 
-private inline fun declinationOfSun(eclipticLongitude: EclipticLongitude): DeclinationOfSun {
+private fun declinationOfSun(eclipticLongitude: EclipticLongitude): DeclinationOfSun {
     val sin = sin(eclipticLongitude.value) * sin(Math.toRadians(23.4397))
     val cos = cos(asin(sin))
     return DeclinationOfSun(sin, cos)
 }
 
 @JvmInline
-value class HourAngle(val value: Double)
+private value class HourAngle(val value: Double)
 
-private inline fun hourAngle(location: Location, declinationOfSun: DeclinationOfSun): HourAngle {
+private fun hourAngle(location: Location, declinationOfSun: DeclinationOfSun): HourAngle {
     val some = (sin(Math.toRadians(-0.833 - 2.076 * sqrt(location.altitude) / 60.0)) - sin(
         Math.toRadians(location.latitude)
     ) * declinationOfSun.sin) / (cos(Math.toRadians(location.latitude)) * declinationOfSun.cos)
@@ -113,7 +115,7 @@ private inline fun hourAngle(location: Location, declinationOfSun: DeclinationOf
     return HourAngle(degrees)
 }
 
-private inline fun julianToInstant(julianTime: Double): Instant {
+private fun julianToInstant(julianTime: Double): Instant {
     val value = (julianTime - 2440587.5) * 86400
     return Instant.ofEpochSecond(floor(value).roundToLong())
 }

@@ -1,7 +1,6 @@
-package com.damiandantas.daylighthabits.modules.forecast.domain
+package com.damiandantas.daylighthabits.modules.forecast
 
-import com.damiandantas.daylighthabits.modules.Forecast
-import com.damiandantas.daylighthabits.modules.location.domain.LocationProvider
+import com.damiandantas.daylighthabits.modules.LocationProvider
 import com.damiandantas.daylighthabits.utils.di.DispatcherDefault
 import dagger.Module
 import dagger.Provides
@@ -21,14 +20,14 @@ interface OnDateForecast {
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ForecastModule {
+private object ForecastModule {
     @Provides
     @Singleton
     fun provideOnDateForecast(calculate: CalculateOnDateForecast): OnDateForecast =
         CachedOnDateForecast(calculate)
 }
 
-class CachedOnDateForecast @Inject constructor(
+private class CachedOnDateForecast @Inject constructor(
     private val forecast: OnDateForecast
 ) : OnDateForecast {
     private val cache = ConcurrentHashMap<LocalDate, Forecast>()
@@ -39,7 +38,7 @@ class CachedOnDateForecast @Inject constructor(
         }
 }
 
-class CalculateOnDateForecast @Inject constructor(
+private class CalculateOnDateForecast @Inject constructor(
     private val locationProvider: LocationProvider,
     private val zoneId: ZoneId,
     @DispatcherDefault private val dispatcherDefault: CoroutineDispatcher

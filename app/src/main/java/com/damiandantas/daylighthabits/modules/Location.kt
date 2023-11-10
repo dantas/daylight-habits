@@ -1,9 +1,7 @@
-package com.damiandantas.daylighthabits.modules.location.system
+package com.damiandantas.daylighthabits.modules
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.damiandantas.daylighthabits.modules.location.domain.Location
-import com.damiandantas.daylighthabits.modules.location.domain.LocationProvider
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -17,7 +15,13 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class FusedLocationProvider @Inject constructor(
+data class Location(val latitude: Double, val longitude: Double, val altitude: Double)
+
+interface LocationProvider {
+    suspend fun currentLocation(): Location
+}
+
+private class FusedLocationProvider @Inject constructor(
     @ApplicationContext private val context: Context
 ) : LocationProvider {
     override suspend fun currentLocation(): Location =
@@ -26,7 +30,7 @@ class FusedLocationProvider @Inject constructor(
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface LocationModule {
+private interface LocationModule {
     @Binds
     fun bindLocationProvider(fusedProvider: FusedLocationProvider): LocationProvider
 }

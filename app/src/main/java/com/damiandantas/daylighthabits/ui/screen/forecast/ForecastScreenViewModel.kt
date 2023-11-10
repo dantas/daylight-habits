@@ -1,8 +1,8 @@
 package com.damiandantas.daylighthabits.ui.screen.forecast
 
 import androidx.lifecycle.ViewModel
-import com.damiandantas.daylighthabits.modules.Forecast
-import com.damiandantas.daylighthabits.modules.forecast.domain.OnDateForecast
+import com.damiandantas.daylighthabits.modules.forecast.Forecast
+import com.damiandantas.daylighthabits.modules.forecast.OnDateForecast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

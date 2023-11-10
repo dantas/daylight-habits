@@ -1,10 +1,11 @@
-package com.damiandantas.daylighthabits.modules.alert.system
+package com.damiandantas.daylighthabits.modules.alert.scheduling
 
 import android.app.AlarmManager
 import android.content.Context
-import com.damiandantas.daylighthabits.modules.Alert
-import com.damiandantas.daylighthabits.modules.SunMomentType
-import com.damiandantas.daylighthabits.modules.alert.domain.SystemScheduler
+import com.damiandantas.daylighthabits.modules.alert.Alert
+import com.damiandantas.daylighthabits.modules.alert.AlertType
+import com.damiandantas.daylighthabits.modules.alert.scheduleAlertIntent
+import com.damiandantas.daylighthabits.modules.alert.unscheduleAlertIntent
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,7 +15,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class SystemSchedulerAlarmManager @Inject constructor(
+interface SystemScheduler {
+    suspend fun schedule(alert: Alert)
+    suspend fun unschedule(type: AlertType)
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+private interface SystemSchedulerModule {
+    @Binds
+    fun bindSystemScheduler(alarmManager: SystemSchedulerAlarmManager): SystemScheduler
+}
+
+private class SystemSchedulerAlarmManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) : SystemScheduler {
     override suspend fun schedule(alert: Alert) = withContext(Dispatchers.IO) {
@@ -27,7 +40,7 @@ class SystemSchedulerAlarmManager @Inject constructor(
         )
     }
 
-    override suspend fun unschedule(type: SunMomentType) {
+    override suspend fun unschedule(type: AlertType) {
         val pendingIntent = unscheduleAlertIntent(context, type) ?: return
 
         context.alarmManager.cancel(pendingIntent)
@@ -35,11 +48,4 @@ class SystemSchedulerAlarmManager @Inject constructor(
 
     private val Context.alarmManager
         get() = this.getSystemService(AlarmManager::class.java)
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-interface SystemSchedulerModule {
-    @Binds
-    fun bindSystemScheduler(alarmManager: SystemSchedulerAlarmManager): SystemScheduler
 }

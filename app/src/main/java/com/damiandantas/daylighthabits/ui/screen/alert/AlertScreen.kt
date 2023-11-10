@@ -27,10 +27,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.damiandantas.daylighthabits.R
-import com.damiandantas.daylighthabits.modules.Alert
-import com.damiandantas.daylighthabits.modules.AlertConfig
 import com.damiandantas.daylighthabits.modules.SunMoment
-import com.damiandantas.daylighthabits.modules.SunMomentType
+import com.damiandantas.daylighthabits.modules.alert.Alert
+import com.damiandantas.daylighthabits.modules.alert.AlertConfig
+import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.ui.composable.AppCard
 import com.damiandantas.daylighthabits.ui.composable.Loading
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
@@ -60,24 +60,24 @@ fun AlertScreenPreview() {
     AppTheme {
         ScreenContent(
             sunrise = SunMoment(
-                type = SunMomentType.SUNRISE,
+                type = AlertType.SUNRISE,
                 time = ZonedDateTime.now(),
                 alert = Alert(
                     time = ZonedDateTime.now().minusMinutes(8),
                     config = AlertConfig(
-                        type = SunMomentType.SUNRISE,
+                        type = AlertType.SUNRISE,
                         noticePeriod = Duration.ofMinutes(8),
                         isEnabled = true
                     )
                 )
             ),
             sunset = SunMoment(
-                type = SunMomentType.SUNSET,
+                type = AlertType.SUNSET,
                 time = ZonedDateTime.now(),
                 alert = Alert(
                     time = ZonedDateTime.now().minusMinutes(15),
                     config = AlertConfig(
-                        type = SunMomentType.SUNSET,
+                        type = AlertType.SUNSET,
                         noticePeriod = Duration.ofMinutes(15),
                         isEnabled = true
                     )

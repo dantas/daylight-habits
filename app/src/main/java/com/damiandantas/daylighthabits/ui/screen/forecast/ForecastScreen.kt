@@ -17,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.damiandantas.daylighthabits.R
-import com.damiandantas.daylighthabits.modules.Forecast
+import com.damiandantas.daylighthabits.modules.forecast.Forecast
 import com.damiandantas.daylighthabits.ui.composable.AppCard
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import kotlinx.coroutines.flow.toCollection

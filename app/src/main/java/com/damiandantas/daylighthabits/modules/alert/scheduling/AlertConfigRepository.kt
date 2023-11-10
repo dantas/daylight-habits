@@ -1,13 +1,12 @@
-package com.damiandantas.daylighthabits.modules.alert.system
+package com.damiandantas.daylighthabits.modules.alert.scheduling
 
 import android.content.Context
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
-import com.damiandantas.daylighthabits.modules.AlertConfig
-import com.damiandantas.daylighthabits.modules.SunMomentType
-import com.damiandantas.daylighthabits.modules.alert.domain.AlertConfigRepository
+import com.damiandantas.daylighthabits.modules.alert.AlertConfig
+import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.proto.AlertConfigProto
 import com.damiandantas.daylighthabits.proto.AlertConfigRepositoryProto
 import com.damiandantas.daylighthabits.utils.suspendRunCatching
@@ -25,7 +24,20 @@ import java.io.OutputStream
 import java.time.Duration
 import javax.inject.Inject
 
-class AlertConfigDataStore @Inject constructor(
+interface AlertConfigRepository {
+    val configs: Flow<AlertConfig>
+    suspend fun save(config: AlertConfig): Result<Unit> // TODO: Check for error
+    suspend fun load(type: AlertType): Result<AlertConfig> // TODO: Check for error
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+private interface AlertConfigRepositoryModule {
+    @Binds
+    fun bindAlertConfigRepository(dataStore: AlertConfigDataStore): AlertConfigRepository
+}
+
+private class AlertConfigDataStore @Inject constructor(
     @ApplicationContext private val context: Context
 ) : AlertConfigRepository {
     private val dataStore = context.alertRepositoryDataStore
@@ -42,12 +54,12 @@ class AlertConfigDataStore @Inject constructor(
             val builder = repositoryProto.toBuilder()
 
             when (config.type) {
-                SunMomentType.SUNRISE -> {
+                AlertType.SUNRISE -> {
                     builder.hasSunrise = true
                     builder.sunrise = config.toAlertConfigProto()
                 }
 
-                SunMomentType.SUNSET -> {
+                AlertType.SUNSET -> {
                     builder.hasSunset = true
                     builder.sunset = config.toAlertConfigProto()
                 }
@@ -57,31 +69,31 @@ class AlertConfigDataStore @Inject constructor(
         }
     }
 
-    override suspend fun load(type: SunMomentType): Result<AlertConfig> = suspendRunCatching {
+    override suspend fun load(type: AlertType): Result<AlertConfig> = suspendRunCatching {
         val repositoryProto = dataStore.data.first()
 
         when (type) {
-            SunMomentType.SUNRISE -> repositoryProto.sunriseAlertConfig
-            SunMomentType.SUNSET -> repositoryProto.sunsetAlertConfig
+            AlertType.SUNRISE -> repositoryProto.sunriseAlertConfig
+            AlertType.SUNSET -> repositoryProto.sunsetAlertConfig
         }
     }
 }
 
 private val AlertConfigRepositoryProto.sunriseAlertConfig: AlertConfig
     get() = if (hasSunrise) {
-        sunrise.toAlertConfig(SunMomentType.SUNRISE)
+        sunrise.toAlertConfig(AlertType.SUNRISE)
     } else {
-        AlertConfig(SunMomentType.SUNRISE)
+        AlertConfig(AlertType.SUNRISE)
     }
 
 private val AlertConfigRepositoryProto.sunsetAlertConfig: AlertConfig
     get() = if (hasSunset) {
-        sunset.toAlertConfig(SunMomentType.SUNSET)
+        sunset.toAlertConfig(AlertType.SUNSET)
     } else {
-        AlertConfig(SunMomentType.SUNSET)
+        AlertConfig(AlertType.SUNSET)
     }
 
-private fun AlertConfigProto.toAlertConfig(type: SunMomentType): AlertConfig =
+private fun AlertConfigProto.toAlertConfig(type: AlertType): AlertConfig =
     AlertConfig(
         type = type,
         noticePeriod = Duration.ofMillis(noticePeriod),
@@ -95,13 +107,6 @@ private fun AlertConfig.toAlertConfigProto(): AlertConfigProto {
     builder.isEnabled = isEnabled
 
     return builder.build()
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-interface AlertConfigRepositoryModule {
-    @Binds
-    fun bindAlertConfigRepository(dataStore: AlertConfigDataStore): AlertConfigRepository
 }
 
 private val Context.alertRepositoryDataStore: DataStore<AlertConfigRepositoryProto> by dataStore(
