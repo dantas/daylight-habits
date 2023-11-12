@@ -1,5 +1,6 @@
 package com.damiandantas.daylighthabits.modules
 
+import androidx.compose.runtime.Immutable
 import com.damiandantas.daylighthabits.modules.alert.Alert
 import com.damiandantas.daylighthabits.modules.alert.AlertConfig
 import com.damiandantas.daylighthabits.modules.alert.AlertType
@@ -14,6 +15,7 @@ import java.time.Duration
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
+@Immutable
 data class SunMoment(
     val type: AlertType,
     val time: ZonedDateTime,

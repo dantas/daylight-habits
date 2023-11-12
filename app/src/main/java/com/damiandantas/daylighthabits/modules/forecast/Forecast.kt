@@ -1,5 +1,6 @@
 package com.damiandantas.daylighthabits.modules.forecast
 
+import androidx.compose.runtime.Immutable
 import com.damiandantas.daylighthabits.modules.Location
 import java.time.Instant
 import java.time.LocalDate
@@ -16,6 +17,7 @@ import kotlin.math.sqrt
 
 // Code below is inspired by https://en.wikipedia.org/wiki/Sunrise_equation
 
+@Immutable
 data class Forecast(val sunrise: ZonedDateTime, val sunset: ZonedDateTime)
 
 fun calculateForecast(location: Location, date: LocalDate, zone: ZoneId): Forecast {
