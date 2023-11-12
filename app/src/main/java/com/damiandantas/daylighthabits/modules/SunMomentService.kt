@@ -8,8 +8,8 @@ import com.damiandantas.daylighthabits.modules.alert.getTime
 import com.damiandantas.daylighthabits.modules.alert.scheduling.AlertConfigRepository
 import com.damiandantas.daylighthabits.modules.alert.scheduling.AlertScheduler
 import com.damiandantas.daylighthabits.modules.forecast.UpcomingForecast
+import com.damiandantas.daylighthabits.utils.parallelMap
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import java.time.Duration
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -25,7 +25,7 @@ class SunMomentService @Inject constructor(
     private val repository: AlertConfigRepository,
     private val domainScheduler: AlertScheduler
 ) {
-    val moments: Flow<SunMoment> = repository.configs.map { config ->
+    val moments: Flow<SunMoment> = repository.configs.parallelMap { config ->
         val forecast = upcomingForecast.get()
 
         SunMoment(
