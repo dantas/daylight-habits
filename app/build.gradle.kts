@@ -41,13 +41,16 @@ android {
     kotlinOptions {
         jvmTarget = "17"
         // Enable Compose compiler reports
+        // Reports are generated only for what changed in the compose layout
+        // To ensure full reports, run: ./gradlew assembleRelease --rerun-tasks
+        val metricsLocation = project.buildDir.absolutePath + "/compose_metrics"
         freeCompilerArgs += listOf(
             "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + project.buildDir.absolutePath + "/compose_metrics"
+            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$metricsLocation"
         )
         freeCompilerArgs += listOf(
             "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + project.buildDir.absolutePath + "/compose_metrics"
+            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$metricsLocation"
         )
     }
     buildFeatures {
