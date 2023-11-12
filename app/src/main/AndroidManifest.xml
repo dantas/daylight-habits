@@ -36,9 +36,10 @@
             android:exported="true" />
 
         <receiver
-            android:name=".modules.alert.scheduling.ReschedulerBroadcastReceiver"
+            android:name="com.damiandantas.daylighthabits.modules.alert.scheduling.ReschedulerBroadcastReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
