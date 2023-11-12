@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,7 +30,7 @@ import java.time.format.FormatStyle
 fun ForecastScreen(viewModel: ForecastScreenViewModel) {
     val nextDaysForecast = remember { mutableStateListOf<Forecast>() }
 
-    LaunchedEffect(viewModel) {
+    LaunchedEffect(null) {
         viewModel.nextDaysForecast.toCollection(nextDaysForecast)
     }
 
@@ -37,7 +38,7 @@ fun ForecastScreen(viewModel: ForecastScreenViewModel) {
 }
 
 @Composable
-private fun ForecastScreenContent(nextDaysForecast: List<Forecast>) {
+private fun ForecastScreenContent(nextDaysForecast: SnapshotStateList<Forecast>) {
     LazyColumn {
         itemsIndexed(
             items = nextDaysForecast,
@@ -56,9 +57,11 @@ private fun ForecastScreenContent(nextDaysForecast: List<Forecast>) {
 @Preview(showSystemUi = true)
 private fun ForecastScreenPreview() {
     AppTheme {
-        val list = List(10) { index ->
+        val list = SnapshotStateList<Forecast>()
+
+        for (index in 0 until 10) {
             val time = ZonedDateTime.now().plusDays(index.toLong())
-            Forecast(time, time)
+            list.add(Forecast(time, time))
         }
 
         ForecastScreenContent(list)
