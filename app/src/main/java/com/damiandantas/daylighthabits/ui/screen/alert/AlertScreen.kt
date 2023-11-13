@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.modules.SunMoment
@@ -32,6 +32,7 @@ import com.damiandantas.daylighthabits.modules.alert.Alert
 import com.damiandantas.daylighthabits.modules.alert.AlertConfig
 import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.ui.composable.AppCard
+import com.damiandantas.daylighthabits.ui.composable.AppColumn
 import com.damiandantas.daylighthabits.ui.composable.Loading
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import java.time.Duration
@@ -100,7 +101,7 @@ private fun ScreenContent(
     onSunsetSetEnable: (Boolean) -> Unit,
     onSunsetSetNoticePeriod: (Duration) -> Unit,
 ) {
-    Column {
+    AppColumn {
         Card(
             cardResources = remember {
                 CardRes(
@@ -148,7 +149,7 @@ private fun Card(
     onSetEnable: (enabled: Boolean) -> Unit,
     onSetNoticePeriod: (Duration) -> Unit
 ) {
-    AppCard(contentModifier = Modifier.fillMaxWidth()) {
+    AppCard(contentModifier = Modifier.fillMaxWidth()) { padding ->
         if (sunMoment == null) {
             Loading()
         } else {
@@ -156,7 +157,8 @@ private fun Card(
                 cardResources = cardResources,
                 sunMoment = sunMoment,
                 onSetEnable = onSetEnable,
-                onSetNoticePeriod = onSetNoticePeriod
+                onSetNoticePeriod = onSetNoticePeriod,
+                padding
             )
         }
     }
@@ -167,7 +169,8 @@ private fun BoxScope.SunMoment(
     cardResources: CardRes,
     sunMoment: SunMoment,
     onSetEnable: (enabled: Boolean) -> Unit,
-    onSetNoticePeriod: (Duration) -> Unit
+    onSetNoticePeriod: (Duration) -> Unit,
+    spacedBy: Dp
 ) {
     var showNoticePeriodDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -183,7 +186,7 @@ private fun BoxScope.SunMoment(
     }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(spacedBy),
         modifier = Modifier.align(Alignment.TopStart)
     ) {
         LabeledTime(

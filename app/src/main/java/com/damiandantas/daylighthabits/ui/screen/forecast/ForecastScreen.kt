@@ -4,8 +4,7 @@ import LabeledTime
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,10 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.modules.forecast.Forecast
 import com.damiandantas.daylighthabits.ui.composable.AppCard
+import com.damiandantas.daylighthabits.ui.composable.AppLazyColumn
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import kotlinx.coroutines.flow.toCollection
 import java.time.ZonedDateTime
@@ -39,15 +39,13 @@ fun ForecastScreen(viewModel: ForecastScreenViewModel) {
 
 @Composable
 private fun ForecastScreenContent(nextDaysForecast: SnapshotStateList<Forecast>) {
-    LazyColumn {
-        itemsIndexed(
+    AppLazyColumn {
+        items(
             items = nextDaysForecast,
-            key = { _, f -> f.hashCode() }
-        ) { index, forecast ->
-            AppCard(
-                useBottomMargin = index == nextDaysForecast.lastIndex
-            ) {
-                CardContent(forecast)
+            key = { f -> f.hashCode() }
+        ) { forecast ->
+            AppCard { padding ->
+                CardContent(forecast, padding)
             }
         }
     }
@@ -69,11 +67,10 @@ private fun ForecastScreenPreview() {
 }
 
 @Composable
-private fun CardContent(forecast: Forecast) {
-    // TODO: Extract 10.dp to somewhere
+private fun CardContent(forecast: Forecast, spacedby: Dp) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(spacedby)
     ) {
         Text(
             text = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).format(forecast.sunrise),
