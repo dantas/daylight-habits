@@ -36,7 +36,7 @@
             android:exported="true" />
 
         <receiver
-            android:name="com.damiandantas.daylighthabits.modules.alert.scheduling.ReschedulerBroadcastReceiver"
+            android:name="com.damiandantas.daylighthabits.modules.alert.schedule.ReschedulerBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
             tools:ignore="Instantiatable">

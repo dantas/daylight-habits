@@ -29,7 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.modules.SunMoment
 import com.damiandantas.daylighthabits.modules.alert.Alert
-import com.damiandantas.daylighthabits.modules.alert.AlertConfig
+import com.damiandantas.daylighthabits.modules.alert.AlertSchedule
 import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.ui.composable.AppCard
 import com.damiandantas.daylighthabits.ui.composable.AppColumn
@@ -65,7 +65,7 @@ fun AlertScreenPreview() {
                 time = ZonedDateTime.now(),
                 alert = Alert(
                     time = ZonedDateTime.now().minusMinutes(8),
-                    config = AlertConfig(
+                    schedule = AlertSchedule(
                         type = AlertType.SUNRISE,
                         noticePeriod = Duration.ofMinutes(8),
                         isEnabled = true
@@ -77,7 +77,7 @@ fun AlertScreenPreview() {
                 time = ZonedDateTime.now(),
                 alert = Alert(
                     time = ZonedDateTime.now().minusMinutes(15),
-                    config = AlertConfig(
+                    schedule = AlertSchedule(
                         type = AlertType.SUNSET,
                         noticePeriod = Duration.ofMinutes(15),
                         isEnabled = true
@@ -204,7 +204,7 @@ private fun BoxScope.SunMoment(
 
             LabeledDuration(
                 title = stringResource(cardResources.noticePeriod),
-                duration = alert.config.noticePeriod
+                duration = alert.schedule.noticePeriod
             )
 
             Button(
@@ -218,7 +218,7 @@ private fun BoxScope.SunMoment(
 
         if (showNoticePeriodDialog) {
             DurationPicker(
-                initialValue = sunMoment.alert?.config?.noticePeriod ?: Duration.ZERO,
+                initialValue = sunMoment.alert?.schedule?.noticePeriod ?: Duration.ZERO,
                 onPick = {
                     onSetNoticePeriod(it)
                     showNoticePeriodDialog = false

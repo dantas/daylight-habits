@@ -4,15 +4,15 @@ option java_package = "com.damiandantas.daylighthabits.proto";
 option java_multiple_files = true;
 option optimize_for = LITE_RUNTIME;
 
-message AlertConfigRepositoryProto {
+message AlertScheduleRepositoryProto {
   bool has_sunrise = 1;
-  AlertConfigProto sunrise = 2;
+  AlertScheduleProto sunrise = 2;
 
   bool has_sunset = 3;
-  AlertConfigProto sunset = 4;
+  AlertScheduleProto sunset = 4;
 }
 
-message AlertConfigProto {
+message AlertScheduleProto {
   int64 notice_period = 2;
   bool is_enabled = 3;
 }

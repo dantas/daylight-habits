@@ -1,10 +1,10 @@
-package com.damiandantas.daylighthabits.modules.alert.scheduling
+package com.damiandantas.daylighthabits.modules.alert.schedule
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.damiandantas.daylighthabits.modules.alert.AlertConfig
+import com.damiandantas.daylighthabits.modules.alert.AlertSchedule
 import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.modules.alert.createAlert
 import com.damiandantas.daylighthabits.modules.forecast.UpcomingForecast
@@ -19,25 +19,25 @@ class AlertScheduler @Inject constructor(
     private val upcomingForecast: UpcomingForecast,
     private val scheduler: SystemScheduler
 ) {
-    suspend fun setSchedule(config: AlertConfig) {
-        val alert = upcomingForecast.get().createAlert(config)
+    suspend fun setSchedule(schedule: AlertSchedule) {
+        val alert = upcomingForecast.get().createAlert(schedule)
 
         if (alert != null) {
             scheduler.schedule(alert)
         } else {
-            scheduler.unschedule(config.type)
+            scheduler.unschedule(schedule.type)
         }
     }
 }
 
 class AlertRescheduler @Inject constructor(
-    private val repository: AlertConfigRepository,
+    private val repository: AlertScheduleRepository,
     private val domainScheduler: AlertScheduler
 ) {
     suspend fun reschedule() {
         for (type in AlertType.values()) {
-            val config = repository.load(type).getOrNull() ?: continue
-            domainScheduler.setSchedule(config)
+            val schedule = repository.load(type).getOrNull() ?: continue
+            domainScheduler.setSchedule(schedule)
         }
     }
 }

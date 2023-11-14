@@ -12,11 +12,11 @@ enum class AlertType {
 @Immutable
 data class Alert(
     val time: ZonedDateTime,
-    val config: AlertConfig,
+    val schedule: AlertSchedule,
 )
 
 @Immutable
-data class AlertConfig(
+data class AlertSchedule(
     val type: AlertType,
     val noticePeriod: Duration,
     val isEnabled: Boolean
@@ -24,12 +24,12 @@ data class AlertConfig(
     constructor(type: AlertType) : this(type, Duration.ZERO, false)
 }
 
-fun Forecast.createAlert(config: AlertConfig): Alert? {
-    if (!config.isEnabled) return null
+fun Forecast.createAlert(schedule: AlertSchedule): Alert? {
+    if (!schedule.isEnabled) return null
 
     return Alert(
-        time = getTime(config.type) - config.noticePeriod,
-        config = config
+        time = getTime(schedule.type) - schedule.noticePeriod,
+        schedule = schedule
     )
 }
 

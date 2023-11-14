@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.modules.alert.scheduling
+package com.damiandantas.daylighthabits.modules.alert.schedule
 
 import android.app.AlarmManager
 import android.content.Context
@@ -31,7 +31,7 @@ private class SystemSchedulerAlarmManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) : SystemScheduler {
     override suspend fun schedule(alert: Alert) = withContext(Dispatchers.IO) {
-        val pendingIntent = scheduleAlertIntent(context, alert.config.type)
+        val pendingIntent = scheduleAlertIntent(context, alert.schedule.type)
 
         context.alarmManager.setExact(
             AlarmManager.RTC_WAKEUP,

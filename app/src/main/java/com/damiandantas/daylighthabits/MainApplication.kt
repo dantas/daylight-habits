@@ -1,7 +1,7 @@
 package com.damiandantas.daylighthabits
 
 import android.app.Application
-import com.damiandantas.daylighthabits.modules.alert.scheduling.AlertRescheduler
+import com.damiandantas.daylighthabits.modules.alert.schedule.AlertRescheduler
 import com.damiandantas.daylighthabits.utils.hasLocationPermission
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
