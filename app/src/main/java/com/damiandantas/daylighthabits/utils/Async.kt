@@ -1,6 +1,5 @@
 package com.damiandantas.daylighthabits.utils
 
-import com.damiandantas.daylighthabits.R
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
