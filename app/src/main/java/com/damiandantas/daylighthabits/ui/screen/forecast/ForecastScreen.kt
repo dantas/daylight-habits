@@ -67,10 +67,10 @@ private fun ForecastScreenPreview() {
 }
 
 @Composable
-private fun CardContent(forecast: Forecast, spacedby: Dp) {
+private fun CardContent(forecast: Forecast, spacedBy: Dp) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(spacedby)
+        verticalArrangement = Arrangement.spacedBy(spacedBy)
     ) {
         Text(
             text = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).format(forecast.sunrise),
