@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Duration
@@ -18,12 +19,19 @@ import javax.inject.Inject
 class AlertScreenViewModel @Inject constructor(
     private val momentService: SunMomentService
 ) : ViewModel() {
+    private val moments =
+        momentService.moments.shareIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            replay = AlertType.values().size // Important so we have enough time to receive initial values
+        )
+
     val sunrise: StateFlow<SunMoment?> =
-        momentService.moments.filter { it.type == AlertType.SUNRISE }
+        moments.filter { it.type == AlertType.SUNRISE }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val sunset: StateFlow<SunMoment?> =
-        momentService.moments.filter { it.type == AlertType.SUNSET }
+        moments.filter { it.type == AlertType.SUNSET }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     fun setSunriseEnabled(isEnabled: Boolean) {
