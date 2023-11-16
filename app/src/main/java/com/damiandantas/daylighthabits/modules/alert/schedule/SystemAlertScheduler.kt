@@ -15,21 +15,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-interface SystemScheduler {
+interface SystemAlertScheduler {
     suspend fun schedule(alert: Alert)
     suspend fun unschedule(type: AlertType)
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
-private interface SystemSchedulerModule {
+private interface SystemAlertSchedulerModule {
     @Binds
-    fun bindSystemScheduler(alarmManager: SystemSchedulerAlarmManager): SystemScheduler
+    fun bindSystemScheduler(alarmManager: SystemAlertSchedulerAlarmManager): SystemAlertScheduler
 }
 
-private class SystemSchedulerAlarmManager @Inject constructor(
+private class SystemAlertSchedulerAlarmManager @Inject constructor(
     @ApplicationContext private val context: Context
-) : SystemScheduler {
+) : SystemAlertScheduler {
     override suspend fun schedule(alert: Alert) = withContext(Dispatchers.IO) {
         val pendingIntent = scheduleAlertIntent(context, alert.schedule.type)
 
