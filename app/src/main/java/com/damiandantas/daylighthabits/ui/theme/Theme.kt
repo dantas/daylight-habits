@@ -1,5 +1,6 @@
 package com.damiandantas.daylighthabits.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -8,6 +9,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -79,8 +81,8 @@ fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    // TODO: Enable at a later date, perhaps use LocalInspectionMode.current
-    val useDynamicColor = false//Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val useDynamicColor =
+        !LocalInspectionMode.current && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
     val colorScheme = when {
         useDynamicColor && useDarkTheme -> dynamicDarkColorScheme(LocalContext.current)
