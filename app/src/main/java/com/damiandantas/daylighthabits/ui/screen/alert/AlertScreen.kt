@@ -34,6 +34,7 @@ import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.ui.composable.AppCard
 import com.damiandantas.daylighthabits.ui.composable.AppColumn
 import com.damiandantas.daylighthabits.ui.composable.Loading
+import com.damiandantas.daylighthabits.ui.composable.cardSpring
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -187,7 +188,9 @@ private fun BoxScope.SunMoment(
 
     Column(
         verticalArrangement = Arrangement.spacedBy(spacedBy),
-        modifier = Modifier.align(Alignment.TopStart)
+        modifier = Modifier
+            .cardSpring()
+            .align(Alignment.TopStart),
     ) {
         LabeledTime(
             title = stringResource(cardResources.sunTime),
@@ -195,16 +198,14 @@ private fun BoxScope.SunMoment(
         )
 
         if (sunMoment.alert != null) {
-            val alert = sunMoment.alert
-
             LabeledTime(
                 title = stringResource(cardResources.alertTime),
-                time = alert.time
+                time = sunMoment.alert.time
             )
 
             LabeledDuration(
                 title = stringResource(cardResources.noticePeriod),
-                duration = alert.schedule.noticePeriod
+                duration = sunMoment.alert.schedule.noticePeriod
             )
 
             Button(
