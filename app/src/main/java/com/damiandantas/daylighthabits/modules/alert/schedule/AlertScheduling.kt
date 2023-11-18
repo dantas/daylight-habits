@@ -17,6 +17,7 @@ class AlertScheduler @Inject constructor(
         val alert = upcomingForecast.get().createAlert(schedule)
 
         if (alert != null) {
+            scheduler.unschedule(schedule.type)
             scheduler.schedule(alert)
         } else {
             scheduler.unschedule(schedule.type)

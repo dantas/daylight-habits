@@ -30,20 +30,15 @@ fun unscheduleAlertIntent(context: Context, type: AlertType): PendingIntent? =
         PendingIntent.FLAG_NO_CREATE, false
     )
 
-private const val TYPE = "type"
-
 /*
         Since scheduled alarms are lost when the app is reinstalled, we can use AlertType.name
     without worrying about refactoring that changes the enum names
  */
 private fun receiverIntent(context: Context, type: AlertType): Intent =
-    Intent(
-        context,
-        AlertReceiver::class.java
-    ).apply {
-        putExtra(TYPE, type.name)
+    Intent(context, AlertReceiver::class.java).apply {
+        action = type.name
     }
 
 private fun getAlertType(intent: Intent): AlertType? =
-    runCatching { AlertType.valueOf(intent.getStringExtra(TYPE) ?: "") }.getOrNull()
+    runCatching { AlertType.valueOf(intent.action ?: "") }.getOrNull()
 
