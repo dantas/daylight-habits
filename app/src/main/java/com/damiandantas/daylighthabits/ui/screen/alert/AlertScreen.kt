@@ -149,7 +149,7 @@ private fun Card(
     onSetEnable: (enabled: Boolean) -> Unit,
     onSetNoticePeriod: (Duration) -> Unit
 ) {
-    AppCard(contentModifier = Modifier.fillMaxWidth()) { padding ->
+    AppCard(modifier = Modifier.fillMaxWidth()) { padding ->
         if (sunMoment == null) {
             Loading()
         } else {

@@ -16,11 +16,11 @@ private val contentPadding = 10.dp
 
 @Composable
 fun AppCard(
-    contentModifier: Modifier = Modifier,
+    modifier: Modifier = Modifier,
     content: @Composable BoxScope.(padding: Dp) -> Unit
 ) {
     ElevatedCard {
-        Box(modifier = contentModifier.padding(contentPadding)) {
+        Box(modifier = modifier.padding(contentPadding)) {
             content(contentPadding)
         }
     }
