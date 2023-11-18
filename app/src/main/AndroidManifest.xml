@@ -7,6 +7,10 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
+    <permission
+        android:name="com.damiandantas.daylighthabits.EXECUTE_ALERT"
+        android:protectionLevel="signature" />
+
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -33,7 +37,8 @@
         <receiver
             android:name=".modules.alert.AlertReceiver"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:permission="com.damiandantas.daylighthabits.EXECUTE_ALERT" />
 
         <receiver
             android:name=".modules.alert.schedule.ReschedulerBroadcastReceiver"
