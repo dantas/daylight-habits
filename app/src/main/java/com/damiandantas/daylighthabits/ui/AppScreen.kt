@@ -20,9 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -97,9 +99,22 @@ fun AppScreen() {
             modifier = Modifier.padding(paddingValues)
         ) {
             for (screen in Screen.values()) {
-                composable(screen.route) {
-                    screen.routeContent(viewModelStore)
-                }
+                composable(
+                    route = screen.route,
+                    enterTransition = {
+                        slideIntoContainer(
+                            towards = animationDirection,
+                            animationSpec = navigationAnimation
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            towards = animationDirection,
+                            animationSpec = navigationAnimation
+                        )
+                    },
+                    content = { screen.routeContent(viewModelStore) }
+                )
             }
         }
     }
@@ -132,3 +147,18 @@ private fun AppNavigationBarPreview() {
         )
     }
 }
+
+private val navigationAnimation = tween<IntOffset>()
+private val routeToPosition = Screen.values().associate { it.route to it.ordinal }
+
+private val AnimatedContentTransitionScope<NavBackStackEntry>.animationDirection: AnimatedContentTransitionScope.SlideDirection
+    get() {
+        val initialPosition = routeToPosition[initialState.destination.route!!]!!
+        val destinationPosition = routeToPosition[targetState.destination.route!!]!!
+
+        return if (initialPosition < destinationPosition) {
+            AnimatedContentTransitionScope.SlideDirection.Left
+        } else {
+            AnimatedContentTransitionScope.SlideDirection.Right
+        }
+    }
