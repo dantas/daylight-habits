@@ -3,6 +3,7 @@ package com.damiandantas.daylighthabits.ui.screen.forecast
 import LabeledTime
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -39,7 +40,7 @@ fun ForecastScreen(viewModel: ForecastScreenViewModel) {
 
 @Composable
 private fun ForecastScreenContent(nextDaysForecast: SnapshotStateList<Forecast>) {
-    AppLazyColumn {
+    AppLazyColumn(modifier = Modifier.fillMaxSize()) {
         items(
             items = nextDaysForecast,
             key = { f -> f.hashCode() }

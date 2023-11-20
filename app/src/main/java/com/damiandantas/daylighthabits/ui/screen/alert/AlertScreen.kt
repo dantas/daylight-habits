@@ -7,6 +7,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledIconToggleButton
@@ -102,7 +103,7 @@ private fun ScreenContent(
     onSunsetSetEnable: (Boolean) -> Unit,
     onSunsetSetNoticePeriod: (Duration) -> Unit,
 ) {
-    AppColumn {
+    AppColumn(modifier = Modifier.fillMaxSize()) {
         Card(
             cardResources = remember {
                 CardRes(

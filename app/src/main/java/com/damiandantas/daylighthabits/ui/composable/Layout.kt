@@ -14,17 +14,18 @@ import androidx.compose.ui.unit.dp
 private val margin = 16.dp
 
 @Composable
-fun AppColumn(content: @Composable ColumnScope.() -> Unit) {
+fun AppColumn(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Column(
         verticalArrangement = Arrangement.spacedBy(margin),
-        modifier = Modifier.padding(margin),
+        modifier = modifier.padding(margin),
         content = content
     )
 }
 
 @Composable
-fun AppLazyColumn(content: LazyListScope.() -> Unit) {
+fun AppLazyColumn(modifier: Modifier = Modifier, content: LazyListScope.() -> Unit) {
     LazyColumn(
+        modifier = modifier,
         contentPadding = PaddingValues(margin),
         verticalArrangement = Arrangement.spacedBy(margin),
         content = content

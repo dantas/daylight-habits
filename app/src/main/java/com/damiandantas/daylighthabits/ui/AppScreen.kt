@@ -2,6 +2,9 @@ package com.damiandantas.daylighthabits.ui
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -53,7 +56,7 @@ private enum class Screen(
         route = "settings",
         icon = R.drawable.instant_mix,
         label = R.string.nav_bar_settings,
-        routeContent = { Text(text = "Settings") }
+        routeContent = { Text(modifier = Modifier.fillMaxSize(), text = "Settings") }
     )
 }
 
