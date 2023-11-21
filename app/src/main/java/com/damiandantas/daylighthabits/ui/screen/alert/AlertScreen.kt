@@ -4,14 +4,26 @@ import DurationPicker
 import LabeledDuration
 import LabeledTime
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
@@ -29,6 +41,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.modules.SunMoment
@@ -196,62 +210,101 @@ private fun BoxScope.SunMoment(
     FilledIconToggleButton(
         checked = hasAlert,
         onCheckedChange = onSetEnable,
-        modifier = Modifier.align(Alignment.CenterEnd)
+        modifier = Modifier
+            .align(Alignment.CenterEnd)
+            .wrapContentSize()
     ) {
         val icon = if (hasAlert) R.drawable.alert_on else R.drawable.alert_off
         Icon(painterResource(id = icon), null)
     }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(spacedBy),
         modifier = Modifier
+            .align(Alignment.TopStart)
             .cardAnimation()
-            .align(Alignment.TopStart),
     ) {
         LabeledTime(
             title = stringResource(cardResources.sunTime),
             time = sunMoment.time
         )
 
-        if (sunMoment.alert != null) {
-            LabeledTime(
-                title = stringResource(cardResources.alertTime),
-                time = sunMoment.alert.time
-            )
+        // TODO: Fix handling of value
 
-            LabeledDuration(
-                title = stringResource(cardResources.noticePeriod),
-                duration = sunMoment.alert.schedule.noticePeriod
-            )
+        ExpandableCardContent(
+            visible = sunMoment.alert != null,
+            paddingTop = spacedBy
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(spacedBy)) {
+                LabeledTime(
+                    title = stringResource(cardResources.alertTime),
+                    time = sunMoment.alert?.time ?: ZonedDateTime.now()
+                )
 
-            Button(
-                onClick = {
-                    showNoticePeriodDialog = true
+                LabeledDuration(
+                    title = stringResource(cardResources.noticePeriod),
+                    duration = sunMoment.alert?.schedule?.noticePeriod ?: Duration.ZERO
+                )
+
+                Button(
+                    onClick = {
+                        showNoticePeriodDialog = true
+                    }
+                ) {
+                    Text(stringResource(cardResources.setNoticePeriod))
                 }
-            ) {
-                Text(stringResource(cardResources.setNoticePeriod))
             }
         }
+    }
 
-        if (showNoticePeriodDialog) {
-            DurationPicker(
-                initialValue = sunMoment.alert?.schedule?.noticePeriod ?: Duration.ZERO,
-                onPick = {
-                    onSetNoticePeriod(it)
-                    showNoticePeriodDialog = false
-                },
-                onDismiss = {
-                    showNoticePeriodDialog = false
-                }
-            )
-        }
+    if (showNoticePeriodDialog) {
+        DurationPicker(
+            initialValue = sunMoment.alert?.schedule?.noticePeriod ?: Duration.ZERO,
+            onPick = {
+                onSetNoticePeriod(it)
+                showNoticePeriodDialog = false
+            },
+            onDismiss = {
+                showNoticePeriodDialog = false
+            }
+        )
     }
 }
 
-fun Modifier.cardAnimation(): Modifier =
+private fun Modifier.cardAnimation(): Modifier =
     animateContentSize(
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessLow
+            stiffness = Spring.StiffnessMedium
         )
     )
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun ExpandableCardContent(
+    visible: Boolean,
+    paddingTop: Dp,
+    content: @Composable AnimatedVisibilityScope.() -> Unit
+) {
+    val springSpec =
+        spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessVeryLow,
+            visibilityThreshold = IntSize.VisibilityThreshold
+        )
+
+    val fadeSpec = spring<Float>(stiffness = Spring.StiffnessVeryLow)
+
+    val transition = updateTransition(visible, "card expansion")
+
+    val animatedPaddingTop = transition.animateDp(label = "dp animation") {
+        if (it) paddingTop else 0.dp
+    }
+
+    transition.AnimatedVisibility(
+        visible = { it },
+        modifier = Modifier.padding(top = animatedPaddingTop.value),
+        enter = expandVertically(springSpec) + fadeIn(fadeSpec),
+        exit = shrinkVertically(springSpec) + fadeOut(fadeSpec),
+        content = content
+    )
+}
