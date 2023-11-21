@@ -4,6 +4,9 @@ import DurationPicker
 import LabeledDuration
 import LabeledTime
 import androidx.annotation.StringRes
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -35,7 +38,6 @@ import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.ui.composable.AppCard
 import com.damiandantas.daylighthabits.ui.composable.AppColumn
 import com.damiandantas.daylighthabits.ui.composable.Loading
-import com.damiandantas.daylighthabits.ui.composable.cardSpring
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -173,7 +175,7 @@ private fun Card(
                 sunMoment = sunMoment,
                 onSetEnable = onSetEnable,
                 onSetNoticePeriod = onSetNoticePeriod,
-                padding
+                spacedBy = padding
             )
         }
     }
@@ -203,7 +205,7 @@ private fun BoxScope.SunMoment(
     Column(
         verticalArrangement = Arrangement.spacedBy(spacedBy),
         modifier = Modifier
-            .cardSpring()
+            .cardAnimation()
             .align(Alignment.TopStart),
     ) {
         LabeledTime(
@@ -245,3 +247,11 @@ private fun BoxScope.SunMoment(
         }
     }
 }
+
+fun Modifier.cardAnimation(): Modifier =
+    animateContentSize(
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
