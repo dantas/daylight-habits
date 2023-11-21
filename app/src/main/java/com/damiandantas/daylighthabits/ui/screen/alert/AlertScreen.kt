@@ -60,35 +60,48 @@ fun AlertScreen(viewModel: AlertScreenViewModel) {
 @Composable
 @Preview(showSystemUi = true)
 fun AlertScreenPreview() {
+    var sunriseEnabled by remember { mutableStateOf(true) }
+    var sunsetEnabled by remember { mutableStateOf(true) }
+
     AppTheme {
         ScreenContent(
             sunrise = SunMoment(
                 type = AlertType.SUNRISE,
                 time = ZonedDateTime.now(),
-                alert = Alert(
-                    time = ZonedDateTime.now().minusMinutes(8),
-                    schedule = AlertSchedule(
-                        type = AlertType.SUNRISE,
-                        noticePeriod = Duration.ofMinutes(8),
-                        isEnabled = true
+                alert =
+                if (sunriseEnabled) {
+                    Alert(
+                        time = ZonedDateTime.now().minusMinutes(8),
+                        schedule = AlertSchedule(
+                            type = AlertType.SUNRISE,
+                            noticePeriod = Duration.ofMinutes(8),
+                            isEnabled = true
+                        )
                     )
-                )
+                } else {
+                    null
+                }
             ),
             sunset = SunMoment(
                 type = AlertType.SUNSET,
                 time = ZonedDateTime.now(),
-                alert = Alert(
-                    time = ZonedDateTime.now().minusMinutes(15),
-                    schedule = AlertSchedule(
-                        type = AlertType.SUNSET,
-                        noticePeriod = Duration.ofMinutes(15),
-                        isEnabled = true
+                alert =
+                if (sunsetEnabled) {
+                    Alert(
+                        time = ZonedDateTime.now().minusMinutes(15),
+                        schedule = AlertSchedule(
+                            type = AlertType.SUNSET,
+                            noticePeriod = Duration.ofMinutes(15),
+                            isEnabled = true
+                        )
                     )
-                )
+                } else {
+                    null
+                }
             ),
-            onSunriseSetEnable = {},
+            onSunriseSetEnable = { sunriseEnabled = it },
             onSunriseSetNoticePeriod = { _ -> },
-            onSunsetSetEnable = {},
+            onSunsetSetEnable = { sunsetEnabled = it },
             onSunsetSetNoticePeriod = { _ -> },
         )
     }
