@@ -1,6 +1,5 @@
-package com.damiandantas.daylighthabits
+package com.damiandantas.daylighthabits.utils
 
-import com.damiandantas.daylighthabits.utils.parallelMap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
