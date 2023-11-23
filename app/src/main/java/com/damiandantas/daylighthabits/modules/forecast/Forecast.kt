@@ -15,10 +15,14 @@ import kotlin.math.roundToLong
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-// Code below is inspired by https://en.wikipedia.org/wiki/Sunrise_equation
-
 @Immutable
 data class Forecast(val sunrise: ZonedDateTime, val sunset: ZonedDateTime)
+
+/*
+    Code below is inspired by https://en.wikipedia.org/wiki/Sunrise_equation
+    Several different websites give different times but these times are all within 5 minutes
+    of the "correct" time, so that's why I assuming this algorithm here is good enough.
+ */
 
 fun calculateForecast(location: Location, date: LocalDate, zone: ZoneId): Forecast {
     val julianDay = julianDay(date, zone)
@@ -30,8 +34,8 @@ fun calculateForecast(location: Location, date: LocalDate, zone: ZoneId): Foreca
     val declinationOfSun = declinationOfSun(eclipticLongitude)
     val hourAngle = hourAngle(location, declinationOfSun)
 
-    val sunrise = julianToInstant(solarTransit.value - hourAngle.value / 360)
-    val sunset = julianToInstant(solarTransit.value + hourAngle.value / 360)
+    val sunrise = julianToInstant(solarTransit.value - hourAngle.value / 360.0)
+    val sunset = julianToInstant(solarTransit.value + hourAngle.value / 360.0)
 
     return Forecast(
         sunrise = sunrise.atZone(zone),
@@ -59,7 +63,7 @@ private fun meanSolarTime(julianDay: JulianDay, location: Location): MeanSolarTi
 private data class SolarMeanAnomaly(val degrees: Double, val radians: Double)
 
 private fun solarMeanAnomaly(meanSolarTime: MeanSolarTime): SolarMeanAnomaly {
-    val degrees = (357.5291 + 0.98560028 * meanSolarTime.value) % 360
+    val degrees = (357.5291 + 0.98560028 * meanSolarTime.value) % 360.0
     val radians = Math.toRadians(degrees)
     return SolarMeanAnomaly(degrees, radians)
 }
@@ -81,7 +85,7 @@ private fun eclipticLongitude(
     solarMeanAnomaly: SolarMeanAnomaly,
     equationOfCenter: EquationOfCenter
 ): EclipticLongitude {
-    val degrees = (solarMeanAnomaly.degrees + equationOfCenter.value + 180.0 + 102.9372) % 360
+    val degrees = (solarMeanAnomaly.degrees + equationOfCenter.value + 180.0 + 102.9372) % 360.0
     return EclipticLongitude(Math.toRadians(degrees))
 }
 
@@ -118,6 +122,6 @@ private fun hourAngle(location: Location, declinationOfSun: DeclinationOfSun): H
 }
 
 private fun julianToInstant(julianTime: Double): Instant {
-    val value = (julianTime - 2440587.5) * 86400
+    val value = (julianTime - 2440587.5) * 86400.0
     return Instant.ofEpochSecond(floor(value).roundToLong())
 }
