@@ -41,24 +41,30 @@ private interface LocationModule {
     fun bindLocationProvider(fusedProvider: FusedLocationProvider): LocationProvider
 }
 
-@SuppressLint("MissingPermission")
 private suspend fun Context.getCurrentLocation(): Location = withContext(Dispatchers.IO) {
-    // TODO: Provide reusable instance?
     val client = LocationServices.getFusedLocationProviderClient(this@getCurrentLocation)
 
-    val task = client.getCurrentLocation(
-        Priority.PRIORITY_BALANCED_POWER_ACCURACY,
-        CancellationTokenSource().token
-    )
-
-    val androidLocation = task.await() ?: client.requestSingleLocation()
+    val androidLocation = client.getCurrentLocation() ?: client.requestSingleLocation()
 
     Location(androidLocation.latitude, androidLocation.longitude, androidLocation.altitude)
 }
 
-// If client.getCurrentLocation returns null, attempt to manually request a location
-// Some say there is no workaround for this but I say lets see what happens:
-// https://medium.com/@debuggingisfun/fusedlocationproviderclients-null-location-2e13d6128031
+@SuppressLint("MissingPermission")
+private suspend fun FusedLocationProviderClient.getCurrentLocation(): android.location.Location? {
+    val availability = locationAvailability.await()
+
+    if (!availability.isLocationAvailable) {
+        return null
+    }
+
+    val task = getCurrentLocation(
+        Priority.PRIORITY_LOW_POWER,
+        CancellationTokenSource().token
+    )
+
+    return task.await()
+}
+
 @SuppressLint("MissingPermission")
 private suspend fun FusedLocationProviderClient.requestSingleLocation(): android.location.Location =
     suspendCancellableCoroutine { continuation ->
@@ -73,7 +79,7 @@ private suspend fun FusedLocationProviderClient.requestSingleLocation(): android
 
         requestLocationUpdates(
             LocationRequest.Builder(60_000)
-                .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+                .setPriority(Priority.PRIORITY_LOW_POWER)
                 .build(),
             listener,
             Looper.getMainLooper()
