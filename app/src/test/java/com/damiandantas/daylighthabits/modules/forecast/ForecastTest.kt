@@ -1,8 +1,6 @@
-package com.damiandantas.daylighthabits
+package com.damiandantas.daylighthabits.modules.forecast
 
 import com.damiandantas.daylighthabits.modules.Location
-import com.damiandantas.daylighthabits.modules.forecast.Forecast
-import com.damiandantas.daylighthabits.modules.forecast.calculateForecast
 import org.junit.Test
 import java.time.Duration
 import java.time.LocalDate
