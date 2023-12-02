@@ -17,7 +17,7 @@ class AlertTest {
     fun `sunrise alert is created with the correct time`() {
         val schedule = AlertSchedule(AlertType.SUNRISE, Duration.ofHours(2), true)
 
-        val sut = forecast.createAlert(schedule)
+        val sut = Alert.create(forecast, schedule)
 
         assertNotNull(sut)
         assertEquals(expected = schedule, actual = sut.schedule)
@@ -28,7 +28,7 @@ class AlertTest {
     fun `sunset alert is created with the correct time`() {
         val schedule = AlertSchedule(AlertType.SUNSET, Duration.ofHours(5), true)
 
-        val sut = forecast.createAlert(schedule)
+        val sut = Alert.create(forecast, schedule)
 
         assertNotNull(sut)
         assertEquals(expected = schedule, actual = sut.schedule)
@@ -39,7 +39,7 @@ class AlertTest {
     fun `cannot create an alert if the schedule is disabled`() {
         val schedule = AlertSchedule(AlertType.SUNSET, Duration.ofHours(1), false)
 
-        val sut = forecast.createAlert(schedule)
+        val sut = Alert.create(forecast, schedule)
 
         assertNull(sut)
     }
@@ -50,7 +50,7 @@ class AlertTest {
         assertEquals(expected = Duration.ZERO, sunriseSchedule.noticePeriod)
         assertFalse(sunriseSchedule.isEnabled)
     }
-    
+
     @Test
     fun `Forecast getTime selects the correct time`() {
         assertEquals(expected = forecast.sunrise, actual = forecast.getTime(AlertType.SUNRISE))
