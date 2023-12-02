@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import com.damiandantas.daylighthabits.modules.alert.Alert
 import com.damiandantas.daylighthabits.modules.alert.AlertSchedule
 import com.damiandantas.daylighthabits.modules.alert.AlertType
-import com.damiandantas.daylighthabits.modules.alert.createAlert
 import com.damiandantas.daylighthabits.modules.alert.getTime
 import com.damiandantas.daylighthabits.modules.alert.schedule.AlertScheduleRepository
 import com.damiandantas.daylighthabits.modules.alert.schedule.AlertScheduler
@@ -33,7 +32,7 @@ class SunMomentService @Inject constructor(
         SunMoment(
             type = schedule.type,
             time = forecast.getTime(schedule.type),
-            alert = forecast.createAlert(schedule)
+            alert = Alert.create(forecast, schedule)
         )
     }
 

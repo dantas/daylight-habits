@@ -3,9 +3,9 @@ package com.damiandantas.daylighthabits.modules.alert.schedule
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.damiandantas.daylighthabits.modules.alert.Alert
 import com.damiandantas.daylighthabits.modules.alert.AlertSchedule
 import com.damiandantas.daylighthabits.modules.alert.AlertType
-import com.damiandantas.daylighthabits.modules.alert.createAlert
 import com.damiandantas.daylighthabits.modules.forecast.UpcomingForecast
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ class AlertScheduler @Inject constructor(
     private val scheduler: SystemAlertScheduler
 ) {
     suspend fun setSchedule(schedule: AlertSchedule) {
-        val alert = upcomingForecast.get().createAlert(schedule)
+        val alert = Alert.create(upcomingForecast.get(), schedule)
 
         if (alert != null) {
             scheduler.unschedule(schedule.type)

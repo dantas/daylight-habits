@@ -49,6 +49,7 @@ import com.damiandantas.daylighthabits.modules.SunMoment
 import com.damiandantas.daylighthabits.modules.alert.Alert
 import com.damiandantas.daylighthabits.modules.alert.AlertSchedule
 import com.damiandantas.daylighthabits.modules.alert.AlertType
+import com.damiandantas.daylighthabits.modules.forecast.Forecast
 import com.damiandantas.daylighthabits.ui.composable.AppCard
 import com.damiandantas.daylighthabits.ui.composable.AppColumn
 import com.damiandantas.daylighthabits.ui.composable.Loading
@@ -76,6 +77,11 @@ fun AlertScreen(viewModel: AlertScreenViewModel) {
 @Composable
 @Preview(showSystemUi = true)
 fun AlertScreenPreview() {
+    val forecast = Forecast(
+        sunrise = ZonedDateTime.now().minusMinutes(8),
+        sunset = ZonedDateTime.now().minusMinutes(15)
+    )
+
     var sunriseEnabled by remember { mutableStateOf(true) }
     var sunsetEnabled by remember { mutableStateOf(true) }
 
@@ -86,8 +92,8 @@ fun AlertScreenPreview() {
                 time = ZonedDateTime.now(),
                 alert =
                 if (sunriseEnabled) {
-                    Alert(
-                        time = ZonedDateTime.now().minusMinutes(8),
+                    Alert.create(
+                        forecast = forecast,
                         schedule = AlertSchedule(
                             type = AlertType.SUNRISE,
                             noticePeriod = Duration.ofMinutes(8),
@@ -103,8 +109,8 @@ fun AlertScreenPreview() {
                 time = ZonedDateTime.now(),
                 alert =
                 if (sunsetEnabled) {
-                    Alert(
-                        time = ZonedDateTime.now().minusMinutes(15),
+                    Alert.create(
+                        forecast = forecast,
                         schedule = AlertSchedule(
                             type = AlertType.SUNSET,
                             noticePeriod = Duration.ofMinutes(15),

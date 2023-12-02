@@ -10,10 +10,29 @@ enum class AlertType {
 }
 
 @Immutable
-data class Alert(
+// Should've been a data class but then we wouldn't be able to hide its copy constructor
+class Alert private constructor(
     val time: ZonedDateTime,
     val schedule: AlertSchedule,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (other !is Alert) return false
+        return time == other.time && schedule == other.schedule
+    }
+
+    override fun hashCode(): Int = 31 * time.hashCode() + schedule.hashCode()
+
+    companion object {
+        fun create(forecast: Forecast, schedule: AlertSchedule): Alert? {
+            if (!schedule.isEnabled) return null
+
+            return Alert(
+                time = forecast.getTime(schedule.type) - schedule.noticePeriod,
+                schedule = schedule
+            )
+        }
+    }
+}
 
 @Immutable
 data class AlertSchedule(
@@ -22,15 +41,6 @@ data class AlertSchedule(
     val isEnabled: Boolean
 ) {
     constructor(type: AlertType) : this(type, Duration.ZERO, false)
-}
-
-fun Forecast.createAlert(schedule: AlertSchedule): Alert? {
-    if (!schedule.isEnabled) return null
-
-    return Alert(
-        time = getTime(schedule.type) - schedule.noticePeriod,
-        schedule = schedule
-    )
 }
 
 fun Forecast.getTime(type: AlertType): ZonedDateTime =
