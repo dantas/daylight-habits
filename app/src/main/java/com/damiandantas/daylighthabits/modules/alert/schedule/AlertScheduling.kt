@@ -1,5 +1,6 @@
 package com.damiandantas.daylighthabits.modules.alert.schedule
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -38,11 +39,13 @@ class AlertRescheduler @Inject constructor(
 }
 
 class ReschedulerBroadcastReceiver : BroadcastReceiver() {
+    @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent) {
         /*
             Do nothing, this exists to bring the application up after is updated
             or after the device rebooted.
             MainApplication class will ensure alarms are reschedule.
+            As long as it is doing nothing, it is OK to suppress UnsafeProtectedBroadcastReceiver
          */
     }
 }
