@@ -3,6 +3,8 @@ package com.damiandantas.daylighthabits.ui
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,6 +18,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -34,6 +37,8 @@ import com.damiandantas.daylighthabits.ui.screen.alert.AlertScreen
 import com.damiandantas.daylighthabits.ui.screen.forecast.ForecastScreen
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 
+// ----
+// Screen definitions, everything else works based on the information defined here
 private enum class Screen(
     val route: String,
     @DrawableRes val icon: Int,
@@ -44,25 +49,35 @@ private enum class Screen(
         route = "alert",
         icon = R.drawable.alert,
         label = R.string.nav_bar_alert,
-        routeContent = { AlertScreen(hiltViewModel(it)) }
+        routeContent = { storeOwner ->
+            AlertScreen(hiltViewModel(storeOwner))
+        }
     ),
 
     Forecast(
         route = "forecast",
         icon = R.drawable.routine,
         label = R.string.nav_bar_forecast,
-        routeContent = { ForecastScreen(hiltViewModel(it)) }
+        routeContent = { storeOwner ->
+            ForecastScreen(hiltViewModel(storeOwner))
+        }
     ),
 
     Settings(
         route = "settings",
         icon = R.drawable.instant_mix,
         label = R.string.nav_bar_settings,
-        routeContent = { Text(modifier = Modifier.fillMaxSize(), text = "Settings") }
+        routeContent = { storeOwner ->
+            Text(
+                modifier = Modifier.fillMaxSize(),
+                text = "Settings"
+            )
+        }
     )
 }
 
 private val startDestination = Screen.Alert
+// ====
 
 @Composable
 fun AppScreen() {
@@ -90,8 +105,7 @@ fun AppScreen() {
             )
         },
     ) { paddingValues ->
-        val viewModelStore =
-            LocalViewModelStoreOwner.current!! // TODO: In which situations returns null?
+        val screenViewModelStore = LocalViewModelStoreOwner.current!!
 
         NavHost(
             navController = navController,
@@ -101,19 +115,9 @@ fun AppScreen() {
             for (screen in Screen.values()) {
                 composable(
                     route = screen.route,
-                    enterTransition = {
-                        slideIntoContainer(
-                            towards = animationDirection,
-                            animationSpec = navigationAnimation
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            towards = animationDirection,
-                            animationSpec = navigationAnimation
-                        )
-                    },
-                    content = { screen.routeContent(viewModelStore) }
+                    enterTransition = { enterTransition() },
+                    exitTransition = { exitTransition() },
+                    content = { screen.routeContent(screenViewModelStore) }
                 )
             }
         }
@@ -147,6 +151,20 @@ private fun AppNavigationBarPreview() {
         )
     }
 }
+
+// ----
+// Animation between screens
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.enterTransition(): EnterTransition =
+    slideIntoContainer(
+        towards = animationDirection,
+        animationSpec = navigationAnimation
+    )
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.exitTransition(): ExitTransition =
+    slideOutOfContainer(
+        towards = animationDirection,
+        animationSpec = navigationAnimation
+    )
 
 private val navigationAnimation = tween<IntOffset>()
 private val routeToPosition = Screen.values().associate { it.route to it.ordinal }
