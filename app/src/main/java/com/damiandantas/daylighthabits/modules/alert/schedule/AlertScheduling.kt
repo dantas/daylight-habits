@@ -32,7 +32,7 @@ class AlertRescheduler @Inject constructor(
 ) {
     suspend fun reschedule() {
         for (type in AlertType.values()) {
-            val schedule = repository.load(type).getOrNull() ?: continue
+            val schedule = repository.load(type) ?: continue
             scheduler.setSchedule(schedule)
         }
     }

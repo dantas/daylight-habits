@@ -9,7 +9,6 @@ import com.damiandantas.daylighthabits.modules.alert.AlertSchedule
 import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.proto.AlertScheduleProto
 import com.damiandantas.daylighthabits.proto.AlertScheduleRepositoryProto
-import com.damiandantas.daylighthabits.utils.suspendRunCatching
 import com.google.protobuf.InvalidProtocolBufferException
 import dagger.Binds
 import dagger.Module
@@ -19,15 +18,16 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.time.Duration
 import javax.inject.Inject
 
 interface AlertScheduleRepository {
-    val schedules: Flow<AlertSchedule>
-    suspend fun save(schedule: AlertSchedule): Result<Unit> // TODO: Check for error
-    suspend fun load(type: AlertType): Result<AlertSchedule> // TODO: Check for error
+    val schedules: Flow<AlertSchedule> // TODO: Handle error
+    suspend fun save(schedule: AlertSchedule): Boolean
+    suspend fun load(type: AlertType): AlertSchedule? // Null in case of error
 }
 
 @Module
@@ -49,30 +49,43 @@ private class AlertScheduleDataStore @Inject constructor(
         }
     }
 
-    override suspend fun save(schedule: AlertSchedule): Result<Unit> = suspendRunCatching {
-        dataStore.updateData { repositoryProto ->
-            val builder = repositoryProto.toBuilder()
+    override suspend fun save(schedule: AlertSchedule): Boolean {
+        val operation =
+            { repositoryProto: AlertScheduleRepositoryProto ->
+                val builder = repositoryProto.toBuilder()
 
-            when (schedule.type) {
-                AlertType.SUNRISE -> {
-                    builder.hasSunrise = true
-                    builder.sunrise = schedule.toAlertScheduleProto()
+                when (schedule.type) {
+                    AlertType.SUNRISE -> {
+                        builder.hasSunrise = true
+                        builder.sunrise = schedule.toAlertScheduleProto()
+                    }
+
+                    AlertType.SUNSET -> {
+                        builder.hasSunset = true
+                        builder.sunset = schedule.toAlertScheduleProto()
+                    }
                 }
 
-                AlertType.SUNSET -> {
-                    builder.hasSunset = true
-                    builder.sunset = schedule.toAlertScheduleProto()
-                }
+                builder.build()
             }
 
-            builder.build()
+        return try {
+            dataStore.updateData(operation)
+            true
+        } catch (_: IOException) {
+            false
         }
     }
 
-    override suspend fun load(type: AlertType): Result<AlertSchedule> = suspendRunCatching {
-        val repositoryProto = dataStore.data.first()
+    override suspend fun load(type: AlertType): AlertSchedule? {
+        val repositoryProto =
+            try {
+                dataStore.data.first()
+            } catch (_: IOException) {
+                return null
+            }
 
-        when (type) {
+        return when (type) {
             AlertType.SUNRISE -> repositoryProto.sunriseAlertSchedule
             AlertType.SUNSET -> repositoryProto.sunsetAlertSchedule
         }

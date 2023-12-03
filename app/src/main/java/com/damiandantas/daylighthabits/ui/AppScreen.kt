@@ -12,6 +12,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -36,6 +38,7 @@ import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.ui.screen.alert.AlertScreen
 import com.damiandantas.daylighthabits.ui.screen.forecast.ForecastScreen
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
+import kotlinx.coroutines.launch
 
 // ----
 // Screen definitions, everything else works based on the information defined here
@@ -43,14 +46,14 @@ private enum class Screen(
     val route: String,
     @DrawableRes val icon: Int,
     @StringRes val label: Int,
-    val routeContent: @Composable (ViewModelStoreOwner) -> Unit
+    val routeContent: @Composable (ViewModelStoreOwner, ShowErrorMessage) -> Unit
 ) {
     Alert(
         route = "alert",
         icon = R.drawable.alert,
         label = R.string.nav_bar_alert,
-        routeContent = { storeOwner ->
-            AlertScreen(hiltViewModel(storeOwner))
+        routeContent = { storeOwner, showErrorMessage ->
+            AlertScreen(hiltViewModel(storeOwner), showErrorMessage)
         }
     ),
 
@@ -58,7 +61,7 @@ private enum class Screen(
         route = "forecast",
         icon = R.drawable.routine,
         label = R.string.nav_bar_forecast,
-        routeContent = { storeOwner ->
+        routeContent = { storeOwner, _ ->
             ForecastScreen(hiltViewModel(storeOwner))
         }
     ),
@@ -67,7 +70,7 @@ private enum class Screen(
         route = "settings",
         icon = R.drawable.instant_mix,
         label = R.string.nav_bar_settings,
-        routeContent = { storeOwner ->
+        routeContent = { _, _ ->
             Text(
                 modifier = Modifier.fillMaxSize(),
                 text = "Settings"
@@ -82,8 +85,10 @@ private val startDestination = Screen.Alert
 @Composable
 fun AppScreen() {
     val navController = rememberNavController()
+    lateinit var showErrorMessage: ShowErrorMessage
 
     Scaffold(
+        snackbarHost = { showErrorMessage = showErrorMessage() },
         bottomBar = {
             val currentBackStack = navController.currentBackStackEntryAsState()
 
@@ -117,7 +122,7 @@ fun AppScreen() {
                     route = screen.route,
                     enterTransition = { enterTransition() },
                     exitTransition = { exitTransition() },
-                    content = { screen.routeContent(screenViewModelStore) }
+                    content = { screen.routeContent(screenViewModelStore, showErrorMessage) }
                 )
             }
         }
@@ -180,3 +185,26 @@ private val AnimatedContentTransitionScope<NavBackStackEntry>.animationDirection
             AnimatedContentTransitionScope.SlideDirection.Right
         }
     }
+// ====
+
+// ----
+// Show error message in a snackbar
+// Ok we are really stretching what is an acceptable composable design,
+// but this is an attempt to hide CoroutineScope and SnackbarHostState inside this function
+// and prevent them from polluting other scopes
+private typealias ShowErrorMessage = (String) -> Unit
+
+@Composable
+private fun showErrorMessage(): ShowErrorMessage {
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    SnackbarHost(snackbarHostState)
+
+    return { message ->
+        scope.launch {
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+}
+// ====

@@ -58,7 +58,7 @@ import java.time.Duration
 import java.time.ZonedDateTime
 
 @Composable
-fun AlertScreen(viewModel: AlertScreenViewModel) {
+fun AlertScreen(viewModel: AlertScreenViewModel, showErrorMessage: (String) -> Unit) {
     // TODO: Check how this composable is recomposed on state change
 
     val sunrise: State<SunMoment?> = viewModel.sunrise.collectAsStateWithLifecycle()
@@ -72,6 +72,14 @@ fun AlertScreen(viewModel: AlertScreenViewModel) {
         onSunsetSetEnable = viewModel::setSunsetEnabled,
         onSunsetSetNoticePeriod = viewModel::setSunsetNoticePeriod,
     )
+
+    val errors = viewModel.errors.collectAsStateWithLifecycle()
+
+    val errorMsg = stringResource(R.string.error)
+
+    errors.value.consume {
+        showErrorMessage(errorMsg) // TODO: Check and specify error
+    }
 }
 
 @Composable
