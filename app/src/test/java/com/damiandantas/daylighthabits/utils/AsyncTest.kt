@@ -9,7 +9,7 @@ import kotlin.test.assertContentEquals
 
 class AsyncTest {
     @Test
-    fun parallelMapIsRespectingFlowSequence() = runTest {
+    fun `parallelMap is processing elements in order`() = runTest {
         val flowOfDelay = flowOf<Long>(200, 1000, 400, 100, 300)
 
         val collectedFlow = flowOfDelay.parallelMap {
@@ -21,7 +21,7 @@ class AsyncTest {
     }
 
     @Test
-    fun parallelMapIsExecutingOutOfOrder() = runTest {
+    fun `parallelMap is processing elements in multiple coroutines without blocking`() = runTest {
         val flowOfValues = flowOf<Long>(200, 1000, 400, 100, 300)
 
         val processedFlow = mutableListOf<Long>()
