@@ -14,8 +14,6 @@ import java.time.Duration
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
-// TODO: Define states like error, loading, moment?
-
 @Immutable
 data class SunMoment(
     val type: AlertType,
@@ -28,41 +26,40 @@ class SunMomentService @Inject constructor(
     private val repository: AlertScheduleRepository,
     private val domainScheduler: AlertScheduler
 ) {
-    val moments: Flow<SunMoment> = repository.schedules.parallelMap { schedule ->
+    val moments: Flow<Result<SunMoment>> = repository.schedules.parallelMap { result ->
         val forecast = upcomingForecast.get()
 
-        SunMoment(
+        val schedule = result.getOrElse { return@parallelMap Result.failure(it) }
+
+        val moment = SunMoment(
             type = schedule.type,
             time = forecast.getTime(schedule.type),
             alert = Alert.create(forecast, schedule)
         )
+
+        Result.success(moment)
     }
 
-    suspend fun setEnabled(type: AlertType, isEnabled: Boolean): Boolean {
-        val newSchedule = updateSchedule(type) { it.copy(isEnabled = isEnabled) } ?: return false
-        domainScheduler.setSchedule(newSchedule)
-        return true
-    }
+    suspend fun setEnabled(type: AlertType, isEnabled: Boolean): Boolean =
+        updateSavedScheduleAndRescheduleIt(type) { it.copy(isEnabled = isEnabled) }
 
-    suspend fun setNoticePeriod(type: AlertType, noticePeriod: Duration): Boolean {
-        val newSchedule =
-            updateSchedule(type) { it.copy(noticePeriod = noticePeriod) } ?: return false
-        domainScheduler.setSchedule(newSchedule)
-        return true
-    }
+    suspend fun setNoticePeriod(type: AlertType, noticePeriod: Duration): Boolean =
+        updateSavedScheduleAndRescheduleIt(type) { it.copy(noticePeriod = noticePeriod) }
 
-    private suspend fun updateSchedule(
+    private suspend fun updateSavedScheduleAndRescheduleIt(
         type: AlertType,
-        block: (oldSchedule: AlertSchedule) -> AlertSchedule
-    ): AlertSchedule? {
-        val oldSchedule = repository.load(type) ?: return null
+        transform: (oldSchedule: AlertSchedule) -> AlertSchedule
+    ): Boolean {
+        val savedSchedule = repository.load(type) ?: return false
 
-        val newSchedule = block(oldSchedule)
+        val updatedSchedule = transform(savedSchedule)
 
-        return if (repository.save(newSchedule)) {
-            newSchedule
-        } else {
-            null
+        val isSaved = repository.save(updatedSchedule)
+
+        if (isSaved) {
+            domainScheduler.setSchedule(updatedSchedule)
         }
+
+        return isSaved
     }
 }

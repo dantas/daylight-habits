@@ -29,7 +29,6 @@ import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,17 +60,19 @@ import java.time.ZonedDateTime
 fun AlertScreen(viewModel: AlertScreenViewModel, showErrorMessage: (String) -> Unit) {
     // TODO: Check how this composable is recomposed on state change
 
-    val sunrise: State<SunMoment?> = viewModel.sunrise.collectAsStateWithLifecycle()
-    val sunset: State<SunMoment?> = viewModel.sunset.collectAsStateWithLifecycle()
+    val sunrise = viewModel.sunrise.collectAsStateWithLifecycle()
+    val sunset = viewModel.sunset.collectAsStateWithLifecycle()
 
     ScreenContent(
-        sunrise = sunrise.value,
-        sunset = sunset.value,
+        sunriseState = sunrise.value,
+        sunsetState = sunset.value,
         onSunriseSetEnable = viewModel::setSunriseEnabled,
         onSunriseSetNoticePeriod = viewModel::setSunriseNoticePeriod,
         onSunsetSetEnable = viewModel::setSunsetEnabled,
         onSunsetSetNoticePeriod = viewModel::setSunsetNoticePeriod,
     )
+
+    // TODO: Improve error messages
 
     val errors = viewModel.errors.collectAsStateWithLifecycle()
 
@@ -95,39 +96,43 @@ fun AlertScreenPreview() {
 
     AppTheme {
         ScreenContent(
-            sunrise = SunMoment(
-                type = AlertType.SUNRISE,
-                time = ZonedDateTime.now(),
-                alert =
-                if (sunriseEnabled) {
-                    Alert.create(
-                        forecast = forecast,
-                        schedule = AlertSchedule(
-                            type = AlertType.SUNRISE,
-                            noticePeriod = Duration.ofMinutes(8),
-                            isEnabled = true
+            sunriseState = AlertScreenViewModel.State.Loaded(
+                SunMoment(
+                    type = AlertType.SUNRISE,
+                    time = ZonedDateTime.now(),
+                    alert =
+                    if (sunriseEnabled) {
+                        Alert.create(
+                            forecast = forecast,
+                            schedule = AlertSchedule(
+                                type = AlertType.SUNRISE,
+                                noticePeriod = Duration.ofMinutes(8),
+                                isEnabled = true
+                            )
                         )
-                    )
-                } else {
-                    null
-                }
+                    } else {
+                        null
+                    }
+                )
             ),
-            sunset = SunMoment(
-                type = AlertType.SUNSET,
-                time = ZonedDateTime.now(),
-                alert =
-                if (sunsetEnabled) {
-                    Alert.create(
-                        forecast = forecast,
-                        schedule = AlertSchedule(
-                            type = AlertType.SUNSET,
-                            noticePeriod = Duration.ofMinutes(15),
-                            isEnabled = true
+            sunsetState = AlertScreenViewModel.State.Loaded(
+                SunMoment(
+                    type = AlertType.SUNSET,
+                    time = ZonedDateTime.now(),
+                    alert =
+                    if (sunsetEnabled) {
+                        Alert.create(
+                            forecast = forecast,
+                            schedule = AlertSchedule(
+                                type = AlertType.SUNSET,
+                                noticePeriod = Duration.ofMinutes(15),
+                                isEnabled = true
+                            )
                         )
-                    )
-                } else {
-                    null
-                }
+                    } else {
+                        null
+                    }
+                )
             ),
             onSunriseSetEnable = { sunriseEnabled = it },
             onSunriseSetNoticePeriod = { _ -> },
@@ -139,8 +144,8 @@ fun AlertScreenPreview() {
 
 @Composable
 private fun ScreenContent(
-    sunrise: SunMoment?,
-    sunset: SunMoment?,
+    sunriseState: AlertScreenViewModel.State,
+    sunsetState: AlertScreenViewModel.State,
     onSunriseSetEnable: (Boolean) -> Unit,
     onSunriseSetNoticePeriod: (Duration) -> Unit,
     onSunsetSetEnable: (Boolean) -> Unit,
@@ -157,7 +162,7 @@ private fun ScreenContent(
                     setNoticePeriod = R.string.sunrise_card_set_notice_time
                 )
             },
-            sunMoment = sunrise,
+            state = sunriseState,
             onSetEnable = onSunriseSetEnable,
             onSetNoticePeriod = onSunriseSetNoticePeriod
         )
@@ -172,7 +177,7 @@ private fun ScreenContent(
                     setNoticePeriod = R.string.sunset_card_set_notice_time
                 )
             },
-            sunMoment = sunset,
+            state = sunsetState,
             onSetEnable = onSunsetSetEnable,
             onSetNoticePeriod = onSunsetSetNoticePeriod
         )
@@ -190,36 +195,38 @@ private data class CardRes(
 @Composable
 private fun Card(
     cardResources: CardRes,
-    sunMoment: SunMoment?,
+    state: AlertScreenViewModel.State,
     onSetEnable: (enabled: Boolean) -> Unit,
     onSetNoticePeriod: (Duration) -> Unit
 ) {
     AppCard(modifier = Modifier.fillMaxWidth()) { padding ->
-        if (sunMoment == null) {
-            Loading()
-        } else {
-            SunMoment(
-                cardResources = cardResources,
-                sunMoment = sunMoment,
-                onSetEnable = onSetEnable,
-                onSetNoticePeriod = onSetNoticePeriod,
-                spacedBy = padding
-            )
+        when (state) {
+            is AlertScreenViewModel.State.Loaded ->
+                Loaded(
+                    cardResources = cardResources,
+                    state = state,
+                    onSetEnable = onSetEnable,
+                    onSetNoticePeriod = onSetNoticePeriod,
+                    spacedBy = padding
+                )
+
+            AlertScreenViewModel.State.Loading ->
+                Loading()
         }
     }
 }
 
 @Composable
-private fun BoxScope.SunMoment(
+private fun BoxScope.Loaded(
     cardResources: CardRes,
-    sunMoment: SunMoment,
+    state: AlertScreenViewModel.State.Loaded,
     onSetEnable: (enabled: Boolean) -> Unit,
     onSetNoticePeriod: (Duration) -> Unit,
     spacedBy: Dp
 ) {
     var showNoticePeriodDialog by rememberSaveable { mutableStateOf(false) }
 
-    val hasAlert = sunMoment.alert != null
+    val hasAlert = state.moment.alert != null
 
     FilledIconToggleButton(
         checked = hasAlert,
@@ -239,24 +246,24 @@ private fun BoxScope.SunMoment(
     ) {
         LabeledTime(
             title = stringResource(cardResources.sunTime),
-            time = sunMoment.time
+            time = state.moment.time
         )
 
         // TODO: Fix handling of value
 
         ExpandableCardContent(
-            visible = sunMoment.alert != null,
+            visible = state.moment.alert != null,
             paddingTop = spacedBy
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(spacedBy)) {
                 LabeledTime(
                     title = stringResource(cardResources.alertTime),
-                    time = sunMoment.alert?.time ?: ZonedDateTime.now()
+                    time = state.moment.alert?.time ?: ZonedDateTime.now()
                 )
 
                 LabeledDuration(
                     title = stringResource(cardResources.noticePeriod),
-                    duration = sunMoment.alert?.schedule?.noticePeriod ?: Duration.ZERO
+                    duration = state.moment.alert?.schedule?.noticePeriod ?: Duration.ZERO
                 )
 
                 Button(
@@ -272,7 +279,7 @@ private fun BoxScope.SunMoment(
 
     if (showNoticePeriodDialog) {
         DurationPicker(
-            initialValue = sunMoment.alert?.schedule?.noticePeriod ?: Duration.ZERO,
+            initialValue = state.moment.alert?.schedule?.noticePeriod ?: Duration.ZERO,
             onPick = {
                 onSetNoticePeriod(it)
                 showNoticePeriodDialog = false

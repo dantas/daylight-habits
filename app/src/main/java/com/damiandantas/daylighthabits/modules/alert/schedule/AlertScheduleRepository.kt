@@ -15,9 +15,11 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.retryWhen
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -25,7 +27,7 @@ import java.time.Duration
 import javax.inject.Inject
 
 interface AlertScheduleRepository {
-    val schedules: Flow<AlertSchedule> // TODO: Handle error
+    val schedules: Flow<Result<AlertSchedule>>
     suspend fun save(schedule: AlertSchedule): Boolean
     suspend fun load(type: AlertType): AlertSchedule? // Null in case of error
 }
@@ -42,12 +44,17 @@ private class AlertScheduleDataStore @Inject constructor(
 ) : AlertScheduleRepository {
     private val dataStore = context.alertRepositoryDataStore
 
-    override val schedules: Flow<AlertSchedule> = flow {
-        dataStore.data.collect { repositoryProto ->
-            emit(repositoryProto.sunriseAlertSchedule)
-            emit(repositoryProto.sunsetAlertSchedule)
+    override val schedules: Flow<Result<AlertSchedule>> =
+        flow {
+            dataStore.data.collect { repositoryProto ->
+                emit(Result.success(repositoryProto.sunriseAlertSchedule))
+                emit(Result.success(repositoryProto.sunsetAlertSchedule))
+            }
+        }.retryWhen { cause, attempt ->
+            val retry = attempt < 2 // Sporadic FS error?
+            if (retry) delay(100) else emit(Result.failure(cause))
+            retry
         }
-    }
 
     override suspend fun save(schedule: AlertSchedule): Boolean {
         val operation =

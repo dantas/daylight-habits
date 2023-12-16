@@ -1,5 +1,6 @@
 package com.damiandantas.daylighthabits.ui.screen.alert
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.damiandantas.daylighthabits.modules.SunMoment
@@ -11,32 +12,47 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Duration
 import javax.inject.Inject
 
-// TODO: Define custom error type ?
-
 @HiltViewModel
 class AlertScreenViewModel @Inject constructor(
     private val momentService: SunMomentService
 ) : ViewModel() {
-    private val _errors = MutableStateFlow(ViewModelEvent(Unit, true))
-    val errors: StateFlow<ViewModelEvent<Unit>> = _errors
+    enum class Error {
+        LOAD, UPDATE
+    }
 
-    // Ensure momentService.moments is collected only once
-    private val moments =
-        momentService.moments.shareIn(
+    sealed class State {
+        object Loading : State()
+
+        @Immutable
+        data class Loaded(val moment: SunMoment) : State()
+    }
+
+    private val _errors = MutableStateFlow(ViewModelEvent(Error.UPDATE, true))
+    val errors: StateFlow<ViewModelEvent<Error>> = _errors
+
+    private val loadedFlow =
+        momentService.moments.mapNotNull { result ->
+            result.onSuccess {
+                return@mapNotNull State.Loaded(it)
+            }
+
+            _errors.value = ViewModelEvent(Error.LOAD)
+            null
+        }.shareIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            replay = AlertType.values().size // Important so we have enough capacity to receive initial values
+            sharingPolicy,
+            AlertType.values().size // Ensure all initial Loaded events are properly stored
         )
 
-    val sunrise: StateFlow<SunMoment?> = stateFilterMoments(AlertType.SUNRISE)
-
-    val sunset: StateFlow<SunMoment?> = stateFilterMoments(AlertType.SUNSET)
+    val sunrise = filterAsStateFlow(AlertType.SUNRISE)
+    val sunset = filterAsStateFlow(AlertType.SUNSET)
 
     fun setSunriseEnabled(isEnabled: Boolean) =
         launchFallibleOperation { momentService.setEnabled(AlertType.SUNRISE, isEnabled) }
@@ -50,13 +66,17 @@ class AlertScreenViewModel @Inject constructor(
     fun setSunsetNoticePeriod(noticePeriod: Duration) =
         launchFallibleOperation { momentService.setNoticePeriod(AlertType.SUNSET, noticePeriod) }
 
-    private fun stateFilterMoments(type: AlertType): StateFlow<SunMoment?> =
-        moments.filter { it.type == type }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
-
     private fun launchFallibleOperation(operation: suspend () -> Boolean) {
         viewModelScope.launch {
-            if (!operation()) _errors.value = ViewModelEvent(Unit) // TODO: Define custom error
+            if (!operation()) _errors.value = ViewModelEvent(Error.UPDATE)
         }
     }
+
+    private fun filterAsStateFlow(type: AlertType): StateFlow<State> =
+        loadedFlow
+            .filter {
+                it.moment.type == type
+            }.stateIn(viewModelScope, sharingPolicy, State.Loading)
+
+    private val sharingPolicy get() = SharingStarted.WhileSubscribed(5_000)
 }
