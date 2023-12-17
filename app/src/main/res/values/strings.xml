@@ -31,5 +31,6 @@
         <item quantity="other">minutes</item>
     </plurals>
 
-    <string name="error">An error occurred in this operation</string>
+    <string name="load_error">Error loading saved schedules</string>
+    <string name="update_error">Error persisting schedule to disk</string>
 </resources>

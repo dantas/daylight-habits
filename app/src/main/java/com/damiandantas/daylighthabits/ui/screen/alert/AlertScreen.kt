@@ -72,20 +72,28 @@ fun AlertScreen(viewModel: AlertScreenViewModel, showErrorMessage: (String) -> U
         onSunsetSetNoticePeriod = viewModel::setSunsetNoticePeriod,
     )
 
-    // TODO: Improve error messages
+    HandleErrors(viewModel, showErrorMessage)
+}
 
+@Composable
+private fun HandleErrors(viewModel: AlertScreenViewModel, showErrorMessage: (String) -> Unit) {
     val errors = viewModel.errors.collectAsStateWithLifecycle()
+    val loadErrorMsg = stringResource(R.string.load_error)
+    val updateErrorMsg = stringResource(R.string.update_error)
 
-    val errorMsg = stringResource(R.string.error)
+    errors.value.consume { error ->
+        val errorMsg = when (error) {
+            AlertScreenViewModel.Error.LOAD -> loadErrorMsg
+            AlertScreenViewModel.Error.UPDATE -> updateErrorMsg
+        }
 
-    errors.value.consume {
-        showErrorMessage(errorMsg) // TODO: Check and specify error
+        showErrorMessage(errorMsg)
     }
 }
 
 @Composable
 @Preview(showSystemUi = true)
-fun AlertScreenPreview() {
+private fun AlertScreenPreview() {
     val forecast = Forecast(
         sunrise = ZonedDateTime.now().minusMinutes(8),
         sunset = ZonedDateTime.now().minusMinutes(15)
