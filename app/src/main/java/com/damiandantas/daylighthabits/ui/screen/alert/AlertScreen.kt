@@ -45,8 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.modules.SunMoment
-import com.damiandantas.daylighthabits.modules.alert.Alert
 import com.damiandantas.daylighthabits.modules.alert.AlertSchedule
+import com.damiandantas.daylighthabits.modules.alert.AlertTime
 import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.modules.forecast.Forecast
 import com.damiandantas.daylighthabits.ui.composable.AppCard
@@ -102,44 +102,50 @@ private fun AlertScreenPreview() {
     var sunriseEnabled by remember { mutableStateOf(true) }
     var sunsetEnabled by remember { mutableStateOf(true) }
 
+    val sunriseSchedule = AlertSchedule(
+        type = AlertType.SUNRISE,
+        noticePeriod = Duration.ofMinutes(8),
+        isEnabled = true
+    )
+
+    val sunsetSchedule = AlertSchedule(
+        type = AlertType.SUNSET,
+        noticePeriod = Duration.ofMinutes(15),
+        isEnabled = true
+    )
+
     AppTheme {
         ScreenContent(
             sunriseState = AlertScreenViewModel.State.Loaded(
                 SunMoment(
                     type = AlertType.SUNRISE,
-                    time = ZonedDateTime.now(),
-                    alert =
+                    sunTime = ZonedDateTime.now(),
+                    alertTime =
                     if (sunriseEnabled) {
-                        Alert.create(
+                        AlertTime.create(
                             forecast = forecast,
-                            schedule = AlertSchedule(
-                                type = AlertType.SUNRISE,
-                                noticePeriod = Duration.ofMinutes(8),
-                                isEnabled = true
-                            )
+                            schedule = sunriseSchedule
                         )
                     } else {
                         null
-                    }
+                    },
+                    alertSchedule = sunriseSchedule
                 )
             ),
             sunsetState = AlertScreenViewModel.State.Loaded(
                 SunMoment(
                     type = AlertType.SUNSET,
-                    time = ZonedDateTime.now(),
-                    alert =
+                    sunTime = ZonedDateTime.now(),
+                    alertTime =
                     if (sunsetEnabled) {
-                        Alert.create(
+                        AlertTime.create(
                             forecast = forecast,
-                            schedule = AlertSchedule(
-                                type = AlertType.SUNSET,
-                                noticePeriod = Duration.ofMinutes(15),
-                                isEnabled = true
-                            )
+                            schedule = sunsetSchedule
                         )
                     } else {
                         null
-                    }
+                    },
+                    alertSchedule = sunsetSchedule
                 )
             ),
             onSunriseSetEnable = { sunriseEnabled = it },
@@ -234,7 +240,7 @@ private fun BoxScope.Loaded(
 ) {
     var showNoticePeriodDialog by rememberSaveable { mutableStateOf(false) }
 
-    val hasAlert = state.moment.alert != null
+    val hasAlert = state.moment.alertTime != null
 
     FilledIconToggleButton(
         checked = hasAlert,
@@ -254,24 +260,22 @@ private fun BoxScope.Loaded(
     ) {
         LabeledTime(
             title = stringResource(cardResources.sunTime),
-            time = state.moment.time
+            time = state.moment.sunTime
         )
 
-        // TODO: Fix handling of value
-
         ExpandableCardContent(
-            visible = state.moment.alert != null,
+            visible = state.moment.alertSchedule.isEnabled,
             paddingTop = spacedBy
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(spacedBy)) {
                 LabeledTime(
                     title = stringResource(cardResources.alertTime),
-                    time = state.moment.alert?.time ?: ZonedDateTime.now()
+                    time = state.moment.alertTime?.time ?: ZonedDateTime.now()
                 )
 
                 LabeledDuration(
                     title = stringResource(cardResources.noticePeriod),
-                    duration = state.moment.alert?.schedule?.noticePeriod ?: Duration.ZERO
+                    duration = state.moment.alertSchedule.noticePeriod
                 )
 
                 Button(
@@ -287,7 +291,7 @@ private fun BoxScope.Loaded(
 
     if (showNoticePeriodDialog) {
         DurationPicker(
-            initialValue = state.moment.alert?.schedule?.noticePeriod ?: Duration.ZERO,
+            initialValue = state.moment.alertSchedule.noticePeriod,
             onPick = {
                 onSetNoticePeriod(it)
                 showNoticePeriodDialog = false

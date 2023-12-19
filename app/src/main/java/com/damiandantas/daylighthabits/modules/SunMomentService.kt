@@ -1,8 +1,8 @@
 package com.damiandantas.daylighthabits.modules
 
 import androidx.compose.runtime.Immutable
-import com.damiandantas.daylighthabits.modules.alert.Alert
 import com.damiandantas.daylighthabits.modules.alert.AlertSchedule
+import com.damiandantas.daylighthabits.modules.alert.AlertTime
 import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.modules.alert.getTime
 import com.damiandantas.daylighthabits.modules.alert.schedule.AlertScheduleRepository
@@ -17,8 +17,9 @@ import javax.inject.Inject
 @Immutable
 data class SunMoment(
     val type: AlertType,
-    val time: ZonedDateTime,
-    val alert: Alert?
+    val sunTime: ZonedDateTime,
+    val alertSchedule: AlertSchedule,
+    val alertTime: AlertTime?
 )
 
 class SunMomentService @Inject constructor(
@@ -29,12 +30,13 @@ class SunMomentService @Inject constructor(
     val moments: Flow<Result<SunMoment>> = repository.schedules.parallelMap { result ->
         val forecast = upcomingForecast.get()
 
-        val schedule = result.getOrElse { return@parallelMap Result.failure(it) }
+        val alertSchedule = result.getOrElse { return@parallelMap Result.failure(it) }
 
         val moment = SunMoment(
-            type = schedule.type,
-            time = forecast.getTime(schedule.type),
-            alert = Alert.create(forecast, schedule)
+            type = alertSchedule.type,
+            sunTime = forecast.getTime(alertSchedule.type),
+            alertSchedule = alertSchedule,
+            alertTime = AlertTime.create(forecast, alertSchedule)
         )
 
         Result.success(moment)
