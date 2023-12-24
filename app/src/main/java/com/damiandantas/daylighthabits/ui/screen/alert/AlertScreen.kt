@@ -53,6 +53,7 @@ import com.damiandantas.daylighthabits.ui.composable.Loading
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import com.damiandantas.daylighthabits.ui.theme.LocalSpacingInsideCard
 import com.damiandantas.daylighthabits.ui.theme.LocalSpacingOutsideCard
+import com.damiandantas.daylighthabits.ui.utils.ViewModelError
 import java.time.Duration
 import java.time.ZonedDateTime
 
@@ -148,8 +149,8 @@ private fun HandleErrors(viewModel: AlertScreenViewModel, showErrorMessage: (Str
 
     errors.value.consume { error ->
         val errorMsg = when (error) {
-            AlertScreenViewModel.Error.LOAD -> loadErrorMsg
-            AlertScreenViewModel.Error.UPDATE -> updateErrorMsg
+            ViewModelError.LOAD -> loadErrorMsg
+            ViewModelError.UPDATE -> updateErrorMsg
         }
 
         showErrorMessage(errorMsg)

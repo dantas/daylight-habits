@@ -6,10 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.damiandantas.daylighthabits.modules.SunMoment
 import com.damiandantas.daylighthabits.modules.SunMomentService
 import com.damiandantas.daylighthabits.modules.alert.AlertType
-import com.damiandantas.daylighthabits.ui.utils.ViewModelEvent
+import com.damiandantas.daylighthabits.ui.utils.StateEventError
+import com.damiandantas.daylighthabits.ui.utils.ViewModelError
+import com.damiandantas.daylighthabits.ui.utils.eventError
+import com.damiandantas.daylighthabits.ui.utils.flowSharingPolicy
+import com.damiandantas.daylighthabits.ui.utils.mutableStateEventError
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
@@ -23,10 +25,6 @@ import javax.inject.Inject
 class AlertScreenViewModel @Inject constructor(
     private val momentService: SunMomentService
 ) : ViewModel() {
-    enum class Error {
-        LOAD, UPDATE
-    }
-
     sealed class State {
         object Loading : State()
 
@@ -34,8 +32,8 @@ class AlertScreenViewModel @Inject constructor(
         data class Loaded(val moment: SunMoment) : State()
     }
 
-    private val _errors = MutableStateFlow(ViewModelEvent(Error.UPDATE, true))
-    val errors: StateFlow<ViewModelEvent<Error>> = _errors
+    private val _errors = ViewModelError.UPDATE.mutableStateEventError()
+    val errors: StateEventError = _errors
 
     private val loadedFlow =
         momentService.moments.mapNotNull { result ->
@@ -43,11 +41,11 @@ class AlertScreenViewModel @Inject constructor(
                 return@mapNotNull State.Loaded(it)
             }
 
-            _errors.value = ViewModelEvent(Error.LOAD)
+            _errors.value = ViewModelError.LOAD.eventError()
             null
         }.shareIn(
             viewModelScope,
-            sharingPolicy,
+            flowSharingPolicy,
             AlertType.values().size // Ensure all initial Loaded events are properly stored
         )
 
@@ -68,7 +66,7 @@ class AlertScreenViewModel @Inject constructor(
 
     private fun launchFallibleOperation(operation: suspend () -> Boolean) {
         viewModelScope.launch {
-            if (!operation()) _errors.value = ViewModelEvent(Error.UPDATE)
+            if (!operation()) _errors.value = ViewModelError.UPDATE.eventError()
         }
     }
 
@@ -76,7 +74,5 @@ class AlertScreenViewModel @Inject constructor(
         loadedFlow
             .filter {
                 it.moment.type == type
-            }.stateIn(viewModelScope, sharingPolicy, State.Loading)
-
-    private val sharingPolicy get() = SharingStarted.WhileSubscribed(5_000)
+            }.stateIn(viewModelScope, flowSharingPolicy, State.Loading)
 }
