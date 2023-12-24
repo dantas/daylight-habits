@@ -39,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,9 +49,10 @@ import com.damiandantas.daylighthabits.modules.alert.AlertTime
 import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.modules.forecast.Forecast
 import com.damiandantas.daylighthabits.ui.composable.AppCard
-import com.damiandantas.daylighthabits.ui.composable.AppColumn
 import com.damiandantas.daylighthabits.ui.composable.Loading
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
+import com.damiandantas.daylighthabits.ui.theme.LocalSpacingInsideCard
+import com.damiandantas.daylighthabits.ui.theme.LocalSpacingOutsideCard
 import java.time.Duration
 import java.time.ZonedDateTime
 
@@ -165,7 +165,10 @@ private fun ScreenContent(
     onSunsetSetEnable: (Boolean) -> Unit,
     onSunsetSetNoticePeriod: (Duration) -> Unit,
 ) {
-    AppColumn(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(LocalSpacingOutsideCard.current)
+    ) {
         Card(
             cardResources = remember {
                 CardRes(
@@ -213,15 +216,14 @@ private fun Card(
     onSetEnable: (enabled: Boolean) -> Unit,
     onSetNoticePeriod: (Duration) -> Unit
 ) {
-    AppCard(modifier = Modifier.fillMaxWidth()) { padding ->
+    AppCard(modifier = Modifier.fillMaxWidth()) {
         when (state) {
             is AlertScreenViewModel.State.Loaded ->
                 Loaded(
                     cardResources = cardResources,
                     state = state,
                     onSetEnable = onSetEnable,
-                    onSetNoticePeriod = onSetNoticePeriod,
-                    spacedBy = padding
+                    onSetNoticePeriod = onSetNoticePeriod
                 )
 
             AlertScreenViewModel.State.Loading ->
@@ -235,8 +237,7 @@ private fun BoxScope.Loaded(
     cardResources: CardRes,
     state: AlertScreenViewModel.State.Loaded,
     onSetEnable: (enabled: Boolean) -> Unit,
-    onSetNoticePeriod: (Duration) -> Unit,
-    spacedBy: Dp
+    onSetNoticePeriod: (Duration) -> Unit
 ) {
     var showNoticePeriodDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -264,10 +265,9 @@ private fun BoxScope.Loaded(
         )
 
         ExpandableCardContent(
-            visible = state.moment.alertSchedule.isEnabled,
-            paddingTop = spacedBy
+            visible = state.moment.alertSchedule.isEnabled
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(spacedBy)) {
+            Column(verticalArrangement = Arrangement.spacedBy(LocalSpacingInsideCard.current)) {
                 LabeledTime(
                     title = stringResource(cardResources.alertTime),
                     time = state.moment.alertTime?.time ?: ZonedDateTime.now()
@@ -315,7 +315,6 @@ private fun Modifier.cardAnimation(): Modifier =
 @Composable
 private fun ExpandableCardContent(
     visible: Boolean,
-    paddingTop: Dp,
     content: @Composable AnimatedVisibilityScope.() -> Unit
 ) {
     val springSpec =
@@ -330,7 +329,7 @@ private fun ExpandableCardContent(
     val transition = updateTransition(visible, "card expansion")
 
     val animatedPaddingTop = transition.animateDp(label = "dp animation") {
-        if (it) paddingTop else 0.dp
+        if (it) LocalSpacingInsideCard.current else 0.dp
     }
 
     transition.AnimatedVisibility(

@@ -6,7 +6,6 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -35,8 +34,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.damiandantas.daylighthabits.R
+import com.damiandantas.daylighthabits.ui.composable.ScreenPadding
 import com.damiandantas.daylighthabits.ui.screen.alert.AlertScreen
 import com.damiandantas.daylighthabits.ui.screen.forecast.ForecastScreen
+import com.damiandantas.daylighthabits.ui.screen.settings.SettingsScreen
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -108,14 +109,16 @@ fun AppScreen() {
                     }
                 }
             )
-        },
+        }
     ) { paddingValues ->
         val screenViewModelStore = LocalViewModelStoreOwner.current!!
 
         NavHost(
             navController = navController,
             startDestination = startDestination.route,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(ScreenPadding)
         ) {
             for (screen in Screen.values()) {
                 composable(

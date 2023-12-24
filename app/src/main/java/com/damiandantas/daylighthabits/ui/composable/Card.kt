@@ -8,21 +8,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
-
-private val contentPadding = 10.dp
+import com.damiandantas.daylighthabits.ui.theme.LocalSpacingInsideCard
 
 @Composable
 fun AppCard(
     modifier: Modifier = Modifier,
-    content: @Composable BoxScope.(padding: Dp) -> Unit
+    content: @Composable BoxScope.() -> Unit
 ) {
     ElevatedCard {
-        Box(modifier = modifier.padding(contentPadding)) {
-            content(contentPadding)
-        }
+        Box(modifier = modifier.padding(LocalSpacingInsideCard.current), content = content)
     }
 }
 
