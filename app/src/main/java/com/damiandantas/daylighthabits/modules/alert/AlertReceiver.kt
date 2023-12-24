@@ -4,17 +4,20 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.core.app.PendingIntentCompat
+import com.damiandantas.daylighthabits.modules.alert.executor.AlertExecutor
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 // TODO: Replace BroadcastReceiver with Activity
 
 @AndroidEntryPoint
-class AlertReceiver @Inject constructor() : BroadcastReceiver() {
+class AlertReceiver @Inject constructor(
+    private val alertExecutor: AlertExecutor
+) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        Log.i("wasd", "Alert ${getAlertType(intent)}")
+//        Log.i("wasd", "Alert ${getAlertType(intent)}")
+        alertExecutor.execute()
     }
 }
 
@@ -41,4 +44,3 @@ private fun receiverIntent(context: Context, type: AlertType): Intent =
 
 private fun getAlertType(intent: Intent): AlertType? =
     runCatching { AlertType.valueOf(intent.action ?: "") }.getOrNull()
-
