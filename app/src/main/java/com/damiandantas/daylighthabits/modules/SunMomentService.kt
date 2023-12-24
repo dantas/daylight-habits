@@ -24,19 +24,19 @@ data class SunMoment(
 
 class SunMomentService @Inject constructor(
     private val upcomingForecast: UpcomingForecast,
-    private val repository: AlertScheduleRepository,
-    private val domainScheduler: AlertScheduler
+    private val scheduleRepository: AlertScheduleRepository,
+    private val scheduler: AlertScheduler
 ) {
-    val moments: Flow<Result<SunMoment>> = repository.schedules.parallelMap { result ->
+    val moments: Flow<Result<SunMoment>> = scheduleRepository.schedules.parallelMap { result ->
         val forecast = upcomingForecast.get()
 
-        val alertSchedule = result.getOrElse { return@parallelMap Result.failure(it) }
+        val schedule = result.getOrElse { return@parallelMap Result.failure(it) }
 
         val moment = SunMoment(
-            type = alertSchedule.type,
-            sunTime = forecast.getTime(alertSchedule.type),
-            alertSchedule = alertSchedule,
-            alertTime = AlertTime.create(forecast, alertSchedule)
+            type = schedule.type,
+            sunTime = forecast.getTime(schedule.type),
+            alertSchedule = schedule,
+            alertTime = AlertTime.create(forecast, schedule)
         )
 
         Result.success(moment)
@@ -52,14 +52,14 @@ class SunMomentService @Inject constructor(
         type: AlertType,
         transform: (oldSchedule: AlertSchedule) -> AlertSchedule
     ): Boolean {
-        val savedSchedule = repository.load(type) ?: return false
+        val current = scheduleRepository.load(type) ?: return false
 
-        val updatedSchedule = transform(savedSchedule)
+        val new = transform(current)
 
-        val isSaved = repository.save(updatedSchedule)
+        val isSaved = scheduleRepository.save(new)
 
         if (isSaved) {
-            domainScheduler.setSchedule(updatedSchedule)
+            scheduler.setSchedule(new)
         }
 
         return isSaved
