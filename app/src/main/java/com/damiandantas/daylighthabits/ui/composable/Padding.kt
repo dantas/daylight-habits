@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import com.damiandantas.daylighthabits.ui.theme.LocalSpacingOutsideCard
 
-val ScreenPadding
+val AppScreenPadding
     @Composable get() = PaddingValues(
         top = LocalSpacingOutsideCard.current,
         start = LocalSpacingOutsideCard.current,

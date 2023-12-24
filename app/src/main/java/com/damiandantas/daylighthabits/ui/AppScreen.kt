@@ -34,7 +34,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.damiandantas.daylighthabits.R
-import com.damiandantas.daylighthabits.ui.composable.ScreenPadding
+import com.damiandantas.daylighthabits.ui.composable.AppScreenPadding
 import com.damiandantas.daylighthabits.ui.screen.alert.AlertScreen
 import com.damiandantas.daylighthabits.ui.screen.forecast.ForecastScreen
 import com.damiandantas.daylighthabits.ui.screen.settings.SettingsScreen
@@ -118,7 +118,7 @@ fun AppScreen() {
             startDestination = startDestination.route,
             modifier = Modifier
                 .padding(paddingValues)
-                .padding(ScreenPadding)
+                .padding(AppScreenPadding)
         ) {
             for (screen in Screen.values()) {
                 composable(
