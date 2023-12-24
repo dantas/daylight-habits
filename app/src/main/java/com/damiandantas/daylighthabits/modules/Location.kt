@@ -27,18 +27,17 @@ interface LocationProvider {
     suspend fun currentLocation(): Location
 }
 
-private class FusedLocationProvider @Inject constructor(
-    @ApplicationContext private val context: Context
-) : LocationProvider {
-    override suspend fun currentLocation(): Location =
-        context.getCurrentLocation()
-}
-
 @Module
 @InstallIn(SingletonComponent::class)
 private interface LocationModule {
     @Binds
-    fun bindLocationProvider(fusedProvider: FusedLocationProvider): LocationProvider
+    fun bindLocationProvider(device: DeviceLocationProvider): LocationProvider
+}
+
+private class DeviceLocationProvider @Inject constructor(
+    @ApplicationContext private val context: Context
+) : LocationProvider {
+    override suspend fun currentLocation(): Location = context.getCurrentLocation()
 }
 
 private suspend fun Context.getCurrentLocation(): Location = withContext(Dispatchers.IO) {
