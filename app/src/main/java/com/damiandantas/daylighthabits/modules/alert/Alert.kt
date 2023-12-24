@@ -40,7 +40,6 @@ class AlertTime private constructor(
             )
         }
     }
-
 }
 
 fun Forecast.getTime(type: AlertType): ZonedDateTime =
