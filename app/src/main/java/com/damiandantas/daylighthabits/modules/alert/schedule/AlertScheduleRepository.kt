@@ -36,17 +36,15 @@ interface AlertScheduleRepository {
 @InstallIn(SingletonComponent::class)
 private interface AlertScheduleRepositoryModule {
     @Binds
-    fun bindAlertScheduleRepository(dataStore: AlertScheduleDataStore): AlertScheduleRepository
+    fun bindAlertScheduleRepository(device: DeviceAlertScheduleRepository): AlertScheduleRepository
 }
 
-private class AlertScheduleDataStore @Inject constructor(
+private class DeviceAlertScheduleRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) : AlertScheduleRepository {
-    private val dataStore = context.alertRepositoryDataStore
-
     override val schedules: Flow<Result<AlertSchedule>> =
         flow {
-            dataStore.data.collect { repositoryProto ->
+            context.alertScheduleDataStore.data.collect { repositoryProto ->
                 emit(Result.success(repositoryProto.sunriseAlertSchedule))
                 emit(Result.success(repositoryProto.sunsetAlertSchedule))
             }
@@ -77,7 +75,7 @@ private class AlertScheduleDataStore @Inject constructor(
             }
 
         return try {
-            dataStore.updateData(operation)
+            context.alertScheduleDataStore.updateData(operation)
             true
         } catch (_: IOException) {
             false
@@ -87,7 +85,7 @@ private class AlertScheduleDataStore @Inject constructor(
     override suspend fun load(type: AlertType): AlertSchedule? {
         val repositoryProto =
             try {
-                dataStore.data.first()
+                context.alertScheduleDataStore.data.first()
             } catch (_: IOException) {
                 return null
             }
@@ -129,12 +127,12 @@ private fun AlertSchedule.toAlertScheduleProto(): AlertScheduleProto {
     return builder.build()
 }
 
-private val Context.alertRepositoryDataStore: DataStore<AlertScheduleRepositoryProto> by dataStore(
+private val Context.alertScheduleDataStore: DataStore<AlertScheduleRepositoryProto> by dataStore(
     fileName = "alert_schedule_repository.pb",
-    serializer = AlertRepositorySerializer
+    serializer = AlertScheduleSerializer
 )
 
-private object AlertRepositorySerializer : Serializer<AlertScheduleRepositoryProto> {
+private object AlertScheduleSerializer : Serializer<AlertScheduleRepositoryProto> {
     override val defaultValue: AlertScheduleRepositoryProto =
         AlertScheduleRepositoryProto.getDefaultInstance()
 
