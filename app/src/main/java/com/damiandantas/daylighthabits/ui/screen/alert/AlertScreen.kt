@@ -76,22 +76,6 @@ fun AlertScreen(viewModel: AlertScreenViewModel, showErrorMessage: (String) -> U
 }
 
 @Composable
-private fun HandleErrors(viewModel: AlertScreenViewModel, showErrorMessage: (String) -> Unit) {
-    val errors = viewModel.errors.collectAsStateWithLifecycle()
-    val loadErrorMsg = stringResource(R.string.load_error)
-    val updateErrorMsg = stringResource(R.string.update_error)
-
-    errors.value.consume { error ->
-        val errorMsg = when (error) {
-            AlertScreenViewModel.Error.LOAD -> loadErrorMsg
-            AlertScreenViewModel.Error.UPDATE -> updateErrorMsg
-        }
-
-        showErrorMessage(errorMsg)
-    }
-}
-
-@Composable
 @Preview(showSystemUi = true)
 private fun AlertScreenPreview() {
     val forecast = Forecast(
@@ -153,6 +137,22 @@ private fun AlertScreenPreview() {
             onSunsetSetEnable = { sunsetEnabled = it },
             onSunsetSetNoticePeriod = { _ -> },
         )
+    }
+}
+
+@Composable
+private fun HandleErrors(viewModel: AlertScreenViewModel, showErrorMessage: (String) -> Unit) {
+    val errors = viewModel.errors.collectAsStateWithLifecycle()
+    val loadErrorMsg = stringResource(R.string.load_error)
+    val updateErrorMsg = stringResource(R.string.update_error)
+
+    errors.value.consume { error ->
+        val errorMsg = when (error) {
+            AlertScreenViewModel.Error.LOAD -> loadErrorMsg
+            AlertScreenViewModel.Error.UPDATE -> updateErrorMsg
+        }
+
+        showErrorMessage(errorMsg)
     }
 }
 
