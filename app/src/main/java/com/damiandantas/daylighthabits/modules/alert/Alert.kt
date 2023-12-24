@@ -42,6 +42,12 @@ class AlertTime private constructor(
     }
 }
 
+@Immutable
+data class AlertSettings(
+    val vibrate: Boolean,
+    val sound: Boolean
+)
+
 fun Forecast.getTime(type: AlertType): ZonedDateTime =
     when (type) {
         AlertType.SUNRISE -> sunrise
