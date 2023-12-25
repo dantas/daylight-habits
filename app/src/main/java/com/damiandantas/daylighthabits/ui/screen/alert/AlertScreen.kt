@@ -222,7 +222,7 @@ private fun Card(
             is AlertScreenViewModel.State.Loaded ->
                 Loaded(
                     cardResources = cardResources,
-                    state = state,
+                    moment = state.moment,
                     onSetEnable = onSetEnable,
                     onSetNoticePeriod = onSetNoticePeriod
                 )
@@ -236,13 +236,13 @@ private fun Card(
 @Composable
 private fun BoxScope.Loaded(
     cardResources: CardRes,
-    state: AlertScreenViewModel.State.Loaded,
+    moment: SunMoment,
     onSetEnable: (enabled: Boolean) -> Unit,
     onSetNoticePeriod: (Duration) -> Unit
 ) {
     var showNoticePeriodDialog by rememberSaveable { mutableStateOf(false) }
 
-    val hasAlert = state.moment.alertTime != null
+    val hasAlert = moment.alertTime != null
 
     FilledIconToggleButton(
         checked = hasAlert,
@@ -262,21 +262,21 @@ private fun BoxScope.Loaded(
     ) {
         LabeledTime(
             title = stringResource(cardResources.sunTime),
-            time = state.moment.sunTime
+            time = moment.sunTime
         )
 
         ExpandableCardContent(
-            visible = state.moment.alertSchedule.isEnabled
+            visible = moment.alertSchedule.isEnabled
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(LocalSpacingInsideCard.current)) {
                 LabeledTime(
                     title = stringResource(cardResources.alertTime),
-                    time = state.moment.alertTime?.time ?: ZonedDateTime.now()
+                    time = moment.alertTime?.time ?: ZonedDateTime.now()
                 )
 
                 LabeledDuration(
                     title = stringResource(cardResources.noticePeriod),
-                    duration = state.moment.alertSchedule.noticePeriod
+                    duration = moment.alertSchedule.noticePeriod
                 )
 
                 Button(
@@ -292,7 +292,7 @@ private fun BoxScope.Loaded(
 
     if (showNoticePeriodDialog) {
         DurationPicker(
-            initialValue = state.moment.alertSchedule.noticePeriod,
+            initialValue = moment.alertSchedule.noticePeriod,
             onPick = {
                 onSetNoticePeriod(it)
                 showNoticePeriodDialog = false
