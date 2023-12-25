@@ -1,16 +1,24 @@
 package com.damiandantas.daylighthabits.modules.alert.executor
 
+import com.damiandantas.daylighthabits.modules.alert.settings.AlertSettingsRepository
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
-
-// TODO: Read settings
 
 class AlertExecutor @Inject constructor(
     private val audio: AlertAudio,
-    private val vibration: AlertVibration
+    private val vibration: AlertVibration,
+    private val repository: AlertSettingsRepository
 ) {
-    fun execute() {
-        audio.play()
-        vibration.vibrate()
+    suspend fun execute() {
+        val settings = repository.settings.first().getOrNull() ?: return
+
+        if (settings.vibrate) {
+            vibration.vibrate()
+        }
+
+        if (settings.sound) {
+            audio.play()
+        }
     }
 
     fun stop() {
