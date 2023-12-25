@@ -11,16 +11,20 @@ import com.google.protobuf.InvalidProtocolBufferException
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.retryWhen
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import javax.inject.Inject
 
 interface AlertSettingsRepository {
+    val settings: Flow<Result<AlertSettings>>
     suspend fun save(settings: AlertSettings): Boolean
-    suspend fun load(): AlertSettings? // Null in case of error
 }
 
 @Module
@@ -31,30 +35,38 @@ private interface AlertSettingsRepositoryModule {
 }
 
 private class DeviceAlertSettingsRepository @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) : AlertSettingsRepository {
+    override val settings: Flow<Result<AlertSettings>> = flow {
+        context.alertSettingsDataStore.data.collect { proto ->
+            emit(Result.success(proto.toSettings()))
+        }
+    }.retryWhen { cause, attempt ->
+        val retry = attempt < 2 // Sporadic FS error?
+        if (retry) delay(100) else emit(Result.failure(cause))
+        retry
+    }
+
     override suspend fun save(settings: AlertSettings): Boolean =
         try {
             context.alertSettingsDataStore.updateData { proto ->
-                proto.toBuilder().apply {
-                    vibrate = settings.vibrate
-                    sound = settings.sound
-                }.build()
+                proto.protoFrom(settings)
             }
 
             true
         } catch (e: IOException) {
             false
         }
-
-    override suspend fun load(): AlertSettings? =
-        try {
-            val proto = context.alertSettingsDataStore.data.first()
-            AlertSettings(vibrate = proto.vibrate, sound = proto.sound)
-        } catch (e: IOException) {
-            null
-        }
 }
+
+private fun AlertSettingsRepositoryProto.toSettings(): AlertSettings =
+    AlertSettings(vibrate = vibrate, sound = sound)
+
+private fun AlertSettingsRepositoryProto.protoFrom(settings: AlertSettings): AlertSettingsRepositoryProto =
+    toBuilder().apply {
+        vibrate = settings.vibrate
+        sound = settings.sound
+    }.build()
 
 private val Context.alertSettingsDataStore: DataStore<AlertSettingsRepositoryProto> by dataStore(
     fileName = "alert_settings_repository.pb",

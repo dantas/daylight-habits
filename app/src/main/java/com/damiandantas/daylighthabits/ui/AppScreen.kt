@@ -71,11 +71,8 @@ private enum class Screen(
         route = "settings",
         icon = R.drawable.instant_mix,
         label = R.string.nav_bar_settings,
-        routeContent = { _, _ ->
-            Text(
-                modifier = Modifier.fillMaxSize(),
-                text = "Settings"
-            )
+        routeContent = { storeOwner, showErrorMessage ->
+            SettingsScreen(hiltViewModel(storeOwner), showErrorMessage)
         }
     )
 }
