@@ -144,8 +144,8 @@ private fun AlertScreenPreview() {
 @Composable
 private fun HandleErrors(viewModel: AlertScreenViewModel, showErrorMessage: (String) -> Unit) {
     val errors = viewModel.errors.collectAsStateWithLifecycle()
-    val loadErrorMsg = stringResource(R.string.load_error)
-    val updateErrorMsg = stringResource(R.string.update_error)
+    val loadErrorMsg = stringResource(R.string.alert_screen_load_error)
+    val updateErrorMsg = stringResource(R.string.alert_screen_update_error)
 
     errors.value.consume { error ->
         val errorMsg = when (error) {
