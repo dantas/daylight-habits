@@ -13,7 +13,7 @@ typealias EventError = ViewModelEvent<ViewModelError>
 typealias MutableStateEventError = MutableStateFlow<EventError>
 typealias StateEventError = StateFlow<ViewModelEvent<ViewModelError>>
 
-fun ViewModelError.mutableStateEventError(): MutableStateEventError =
-    MutableStateFlow(ViewModelEvent(this, false))
+fun mutableStateEventError(): MutableStateEventError =
+    MutableStateFlow(ViewModelEvent(ViewModelError.LOAD, true))
 
 fun ViewModelError.eventError(): EventError = ViewModelEvent(this)

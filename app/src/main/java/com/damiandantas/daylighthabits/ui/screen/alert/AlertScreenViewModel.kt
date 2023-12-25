@@ -32,7 +32,7 @@ class AlertScreenViewModel @Inject constructor(
         data class Loaded(val moment: SunMoment) : State()
     }
 
-    private val _errors = ViewModelError.UPDATE.mutableStateEventError()
+    private val _errors = mutableStateEventError()
     val errors: StateEventError = _errors
 
     private val loadedFlow =
