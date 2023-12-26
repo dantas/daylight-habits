@@ -4,12 +4,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,11 +36,8 @@ class AlertActivity : ComponentActivity() {
 
         val alertType = intent.alertType
 
-        Log.i("wasd", "Got type $alertType")
-        
         if (alertType == null) {
             // TODO: Track error?
-            Log.i("wasd", "Finished")
             finish()
             return
         }
@@ -50,17 +47,20 @@ class AlertActivity : ComponentActivity() {
         }
 
         setContent {
-            AlertActivityScreen(alertType) {
-                alertExecutor.stop()
-            }
+            AlertActivityScreen(alertType, ::stopAlert)
         }
     }
 
     override fun onStop() {
         super.onStop()
+        stopAlert()
+    }
+
+    private fun stopAlert() {
         alertExecutor.stop()
         finish()
     }
+
 }
 
 fun scheduleAlertIntent(context: Context, type: AlertType): PendingIntent =
@@ -81,6 +81,7 @@ private fun AlertActivityScreen(type: AlertType, onStop: () -> Unit) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Text(
                     stringResource(messageId),
+                    style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier.align(BiasAlignment(0f, -0.2f))
                 )
                 Button(
