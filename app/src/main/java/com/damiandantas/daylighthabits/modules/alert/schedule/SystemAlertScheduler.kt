@@ -4,8 +4,8 @@ import android.app.AlarmManager
 import android.content.Context
 import com.damiandantas.daylighthabits.modules.alert.AlertTime
 import com.damiandantas.daylighthabits.modules.alert.AlertType
-import com.damiandantas.daylighthabits.modules.alert.scheduleAlertIntent
-import com.damiandantas.daylighthabits.modules.alert.unscheduleAlertIntent
+import com.damiandantas.daylighthabits.modules.alert.executor.scheduleAlertIntent
+import com.damiandantas.daylighthabits.modules.alert.executor.unscheduleAlertIntent
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -24,10 +24,10 @@ interface SystemAlertScheduler {
 @InstallIn(SingletonComponent::class)
 private interface SystemAlertSchedulerModule {
     @Binds
-    fun bindSystemScheduler(alarmManager: SystemAlertSchedulerAlarmManager): SystemAlertScheduler
+    fun bindSystemScheduler(device: DeviceSystemAlertScheduler): SystemAlertScheduler
 }
 
-private class SystemAlertSchedulerAlarmManager @Inject constructor(
+private class DeviceSystemAlertScheduler @Inject constructor(
     @ApplicationContext private val context: Context
 ) : SystemAlertScheduler {
     override suspend fun schedule(alertTime: AlertTime) = withContext(Dispatchers.IO) {
