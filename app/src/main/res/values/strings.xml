@@ -38,4 +38,8 @@
     <string name="settings_screen_sound">Sound</string>
     <string name="settings_screen_load_error">Error loading saved settings</string>
     <string name="settings_screen_update_error">Error persisting settings to disk</string>
+
+    <string name="alert_activity_message_sunrise">Time to sleep</string>
+    <string name="alert_activity_message_sunset">Time to go out</string>
+    <string name="alert_activity_button">Dismiss</string>
 </resources>

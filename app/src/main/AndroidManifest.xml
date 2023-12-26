@@ -16,13 +16,13 @@
         android:name=".MainApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.NoActionBar"
-        android:enableOnBackInvokedCallback="true"
         tools:targetApi="33">
 
         <activity
@@ -35,10 +35,11 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".modules.alert.AlertReceiver"
+        <activity
+            android:name=".modules.alert.executor.AlertActivity"
             android:enabled="true"
             android:exported="true"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:permission="com.damiandantas.daylighthabits.EXECUTE_ALERT" />
 
         <receiver
@@ -53,4 +54,5 @@
             </intent-filter>
         </receiver>
     </application>
+
 </manifest>
