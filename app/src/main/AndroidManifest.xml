@@ -28,7 +28,10 @@
         <activity
             android:name=".MainActivity"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -39,8 +42,10 @@
             android:name=".modules.alert.executor.AlertActivity"
             android:enabled="true"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:permission="com.damiandantas.daylighthabits.EXECUTE_ALERT" />
+            android:permission="com.damiandantas.daylighthabits.EXECUTE_ALERT"
+            tools:ignore="LockedOrientationActivity" />
 
         <receiver
             android:name=".modules.alert.schedule.ReschedulerBroadcastReceiver"
