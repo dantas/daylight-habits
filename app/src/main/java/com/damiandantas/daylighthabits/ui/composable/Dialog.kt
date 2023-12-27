@@ -23,6 +23,8 @@ import androidx.compose.ui.window.Dialog
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 
+// TODO: Revise preview
+
 @Composable
 fun AppDialog(
     onDismissRequest: () -> Unit,
@@ -68,7 +70,7 @@ fun LocationPermissionDialog(onDismissDialog: () -> Unit, onClickButton: () -> U
     }
 }
 
-@Preview(showSystemUi = true)
+@Preview
 @Composable
 private fun AppDialogPreview() {
     AppTheme {
@@ -79,7 +81,7 @@ private fun AppDialogPreview() {
 }
 
 @Composable
-@Preview(showSystemUi = true)
+@Preview
 private fun LocationPermissionDialogPreview() {
     AppTheme {
         LocationPermissionDialog(onDismissDialog = {}, onClickButton = {})
