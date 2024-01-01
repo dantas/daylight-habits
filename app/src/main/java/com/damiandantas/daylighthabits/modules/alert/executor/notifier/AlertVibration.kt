@@ -17,12 +17,12 @@ interface AlertVibration {
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface AlertVibrationModule {
+private interface AlertVibrationModule {
     @Binds
     fun bindAlertVibration(deviceVibration: DeviceAlertVibration): AlertVibration
 }
 
-class DeviceAlertVibration @Inject constructor(
+private class DeviceAlertVibration @Inject constructor(
     @ApplicationContext private val context: Context
 ) : AlertVibration {
     private val vibrator = context.getSystemService(Vibrator::class.java)

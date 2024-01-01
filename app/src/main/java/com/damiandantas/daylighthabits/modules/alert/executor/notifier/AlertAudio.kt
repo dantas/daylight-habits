@@ -16,12 +16,12 @@ interface AlertAudio {
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface AlertAudioModule {
+private interface AlertAudioModule {
     @Binds
     fun bindAlertAudio(deviceAudio: DeviceAlertAudio): AlertAudio
 }
 
-class DeviceAlertAudio @Inject constructor(
+private class DeviceAlertAudio @Inject constructor(
     @ApplicationContext private val context: Context
 ) : AlertAudio {
     private val manager = RingtoneManager(context)
