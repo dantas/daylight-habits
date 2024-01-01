@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.modules.alert.executor
+package com.damiandantas.daylighthabits.modules.alert.executor.notifier
 
 import android.content.Context
 import android.os.VibrationEffect

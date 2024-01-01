@@ -1,15 +1,15 @@
-package com.damiandantas.daylighthabits.modules.alert.executor
+package com.damiandantas.daylighthabits.modules.alert.executor.notifier
 
 import com.damiandantas.daylighthabits.modules.alert.settings.AlertSettingsRepository
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class AlertExecutor @Inject constructor(
+class AlertNotifier @Inject constructor(
     private val audio: AlertAudio,
     private val vibration: AlertVibration,
     private val repository: AlertSettingsRepository
 ) {
-    suspend fun execute() {
+    suspend fun notify() {
         val settings = repository.settings.first().getOrNull() ?: return
 
         if (settings.vibrate) {
