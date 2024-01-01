@@ -1,6 +1,5 @@
 package com.damiandantas.daylighthabits.modules.alert.executor
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -17,11 +16,13 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.app.PendingIntentCompat
 import androidx.lifecycle.lifecycleScope
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.modules.alert.AlertType
+import com.damiandantas.daylighthabits.modules.alert.executor.notifier.AlertNotifier
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
+import com.damiandantas.daylighthabits.utils.alertType
+import com.damiandantas.daylighthabits.utils.put
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +30,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AlertActivity : ComponentActivity() {
     @Inject
-    lateinit var alertExecutor: AlertExecutor
+    lateinit var notifier: AlertNotifier
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,14 +38,12 @@ class AlertActivity : ComponentActivity() {
         val alertType = intent.alertType
 
         if (alertType == null) {
-            // TODO: Track error?
+            // TODO: Track this?
             finish()
             return
         }
 
-        lifecycleScope.launch {
-            alertExecutor.execute()
-        }
+        startAlert()
 
         setContent {
             AlertActivityScreen(alertType, ::stopAlert)
@@ -56,18 +55,22 @@ class AlertActivity : ComponentActivity() {
         stopAlert()
     }
 
+    private fun startAlert() {
+        lifecycleScope.launch {
+            notifier.notify()
+        }
+    }
+
     private fun stopAlert() {
-        alertExecutor.stop()
+        notifier.stop()
         finish()
     }
 
+    companion object {
+        fun intent(context: Context, type: AlertType): Intent =
+            Intent(context, AlertActivity::class.java).put(type)
+    }
 }
-
-fun scheduleAlertIntent(context: Context, type: AlertType): PendingIntent =
-    getPendingIntent(context, type, false)!!
-
-fun unscheduleAlertIntent(context: Context, type: AlertType): PendingIntent? =
-    getPendingIntent(context, type, true)
 
 @Composable
 private fun AlertActivityScreen(type: AlertType, onStop: () -> Unit) {
@@ -100,21 +103,3 @@ private fun AlertActivityScreen(type: AlertType, onStop: () -> Unit) {
 private fun AlertActivityPreview() {
     AlertActivityScreen(AlertType.SUNSET) {}
 }
-
-/*
-        Since scheduled alarms are lost when the app is reinstalled, we can use AlertType.name
-    without worrying about refactoring that changes the enum names
- */
-private fun getPendingIntent(context: Context, type: AlertType, noCreate: Boolean): PendingIntent? {
-    val intent = Intent(context, AlertActivity::class.java).apply {
-        action = type.name
-    }
-
-    return PendingIntentCompat.getActivity(
-        context, 0, intent,
-        if (noCreate) PendingIntent.FLAG_NO_CREATE else 0, false
-    )
-}
-
-private val Intent.alertType: AlertType?
-    get() = runCatching { AlertType.valueOf(action ?: "") }.getOrNull()
