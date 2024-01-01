@@ -2,7 +2,6 @@ package com.damiandantas.daylighthabits.modules.alert.schedule
 
 import android.app.AlarmManager
 import android.content.Context
-import com.damiandantas.daylighthabits.modules.alert.AlertTime
 import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.modules.alert.executor.scheduleAlertIntent
 import com.damiandantas.daylighthabits.modules.alert.executor.unscheduleAlertIntent
@@ -13,10 +12,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 interface SystemAlertScheduler {
-    suspend fun schedule(alertTime: AlertTime)
+    suspend fun schedule(type: AlertType, time: ZonedDateTime)
     suspend fun unschedule(type: AlertType)
 }
 
@@ -30,12 +30,12 @@ private interface SystemAlertSchedulerModule {
 private class DeviceSystemAlertScheduler @Inject constructor(
     @ApplicationContext private val context: Context
 ) : SystemAlertScheduler {
-    override suspend fun schedule(alertTime: AlertTime) = withContext(Dispatchers.IO) {
-        val pendingIntent = scheduleAlertIntent(context, alertTime.type)
+    override suspend fun schedule(type: AlertType, time: ZonedDateTime) = withContext(Dispatchers.IO) {
+        val pendingIntent = scheduleAlertIntent(context, type)
 
         context.alarmManager.setExact(
             AlarmManager.RTC_WAKEUP,
-            alertTime.time.toEpochSecond() * 1000L,
+            time.toEpochSecond() * 1000L,
             pendingIntent
         )
     }

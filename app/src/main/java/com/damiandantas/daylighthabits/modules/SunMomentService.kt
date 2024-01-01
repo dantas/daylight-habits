@@ -2,8 +2,8 @@ package com.damiandantas.daylighthabits.modules
 
 import androidx.compose.runtime.Immutable
 import com.damiandantas.daylighthabits.modules.alert.AlertSchedule
-import com.damiandantas.daylighthabits.modules.alert.AlertTime
 import com.damiandantas.daylighthabits.modules.alert.AlertType
+import com.damiandantas.daylighthabits.modules.alert.alertTime
 import com.damiandantas.daylighthabits.modules.alert.getTime
 import com.damiandantas.daylighthabits.modules.alert.schedule.AlertScheduleRepository
 import com.damiandantas.daylighthabits.modules.alert.schedule.AlertScheduler
@@ -19,7 +19,7 @@ data class SunMoment(
     val type: AlertType,
     val sunTime: ZonedDateTime,
     val alertSchedule: AlertSchedule,
-    val alertTime: AlertTime?
+    val alertTime: ZonedDateTime
 )
 
 class SunMomentService @Inject constructor(
@@ -36,7 +36,7 @@ class SunMomentService @Inject constructor(
             type = schedule.type,
             sunTime = forecast.getTime(schedule.type),
             alertSchedule = schedule,
-            alertTime = AlertTime.create(forecast, schedule)
+            alertTime = schedule.alertTime(forecast)
         )
 
         Result.success(moment)

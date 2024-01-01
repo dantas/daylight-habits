@@ -45,7 +45,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.modules.SunMoment
 import com.damiandantas.daylighthabits.modules.alert.AlertSchedule
-import com.damiandantas.daylighthabits.modules.alert.AlertTime
 import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.modules.forecast.Forecast
 import com.damiandantas.daylighthabits.ui.composable.AppCard
@@ -105,15 +104,7 @@ private fun AlertScreenPreview() {
                 SunMoment(
                     type = AlertType.SUNRISE,
                     sunTime = ZonedDateTime.now(),
-                    alertTime =
-                    if (sunriseEnabled) {
-                        AlertTime.create(
-                            forecast = forecast,
-                            schedule = sunriseSchedule
-                        )
-                    } else {
-                        null
-                    },
+                    alertTime = ZonedDateTime.now().minus(sunriseSchedule.noticePeriod),
                     alertSchedule = sunriseSchedule
                 )
             ),
@@ -121,15 +112,7 @@ private fun AlertScreenPreview() {
                 SunMoment(
                     type = AlertType.SUNSET,
                     sunTime = ZonedDateTime.now(),
-                    alertTime =
-                    if (sunsetEnabled) {
-                        AlertTime.create(
-                            forecast = forecast,
-                            schedule = sunsetSchedule
-                        )
-                    } else {
-                        null
-                    },
+                    alertTime = ZonedDateTime.now().minus(sunsetSchedule.noticePeriod),
                     alertSchedule = sunsetSchedule
                 )
             ),
@@ -242,16 +225,14 @@ private fun BoxScope.Loaded(
 ) {
     var showNoticePeriodDialog by rememberSaveable { mutableStateOf(false) }
 
-    val hasAlert = moment.alertTime != null
-
     FilledIconToggleButton(
-        checked = hasAlert,
+        checked = moment.alertSchedule.isEnabled,
         onCheckedChange = onSetEnable,
         modifier = Modifier
             .align(Alignment.CenterEnd)
             .wrapContentSize()
     ) {
-        val icon = if (hasAlert) R.drawable.alert_on else R.drawable.alert_off
+        val icon = if (moment.alertSchedule.isEnabled) R.drawable.alert_on else R.drawable.alert_off
         Icon(painterResource(id = icon), null)
     }
 
@@ -271,7 +252,7 @@ private fun BoxScope.Loaded(
             Column(verticalArrangement = Arrangement.spacedBy(LocalSpacingInsideCard.current)) {
                 LabeledTime(
                     title = stringResource(cardResources.alertTime),
-                    time = moment.alertTime?.time ?: ZonedDateTime.now()
+                    time = moment.alertTime
                 )
 
                 LabeledDuration(
