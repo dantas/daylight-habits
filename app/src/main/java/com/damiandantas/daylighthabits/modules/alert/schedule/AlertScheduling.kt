@@ -1,6 +1,5 @@
 package com.damiandantas.daylighthabits.modules.alert.schedule
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -10,6 +9,11 @@ import com.damiandantas.daylighthabits.modules.alert.alertTime
 import com.damiandantas.daylighthabits.modules.alert.getTime
 import com.damiandantas.daylighthabits.modules.forecast.Forecast
 import com.damiandantas.daylighthabits.modules.forecast.UpcomingForecast
+import com.damiandantas.daylighthabits.utils.hasLocationPermission
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -42,15 +46,23 @@ class AlertRescheduler @Inject constructor(
     }
 }
 
+@AndroidEntryPoint
 class ReschedulerBroadcastReceiver : BroadcastReceiver() {
-    @SuppressLint("UnsafeProtectedBroadcastReceiver")
+    @Inject
+    lateinit var rescheduler: AlertRescheduler
+
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent) {
-        /*
-            Do nothing, this exists to bring the application up after is updated
-            or after the device rebooted.
-            MainApplication class will ensure alarms are reschedule.
-            As long as it is doing nothing, it is OK to suppress UnsafeProtectedBroadcastReceiver
-         */
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED && intent.action != Intent.ACTION_MY_PACKAGE_REPLACED) {
+            return
+        }
+
+        val pendingResult = goAsync()
+
+        GlobalScope.launch {
+            if (context.hasLocationPermission()) rescheduler.reschedule()
+            pendingResult.finish()
+        }
     }
 }
 

@@ -85,6 +85,8 @@ fun AppScreen() {
     val navController = rememberNavController()
     lateinit var showErrorMessage: ShowErrorMessage
 
+    hiltViewModel<AppScreenViewModel>() // Instantiate view model
+
     Scaffold(
         snackbarHost = { showErrorMessage = showErrorMessage() },
         bottomBar = {
