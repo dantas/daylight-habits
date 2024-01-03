@@ -1,11 +1,13 @@
 package com.damiandantas.daylighthabits
 
 import android.Manifest
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,39 +25,57 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var showSplashScreen by mutableStateOf(true)
-
-        installSplashScreen().setKeepOnScreenCondition {
-            showSplashScreen
-        }
-
         setContent {
-            var showAppScreen by remember { mutableStateOf(false) }
-
-            LaunchedEffect(this) {
-                showAppScreen = hasLocationPermission()
-                showSplashScreen = false
-            }
-
-            val launcher =
-                rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { enabled ->
-                    showAppScreen = enabled
-                    if (!enabled) finish()
-                }
-
             AppTheme {
-                if (showAppScreen) {
-                    AppScreen()
-                } else {
-                    LocationPermissionDialog(
-                        onDismissDialog = {
-                            finish()
-                        }, onClickButton = {
-                            launcher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                ActivityScreen { state ->
+                    when (state) {
+                        State.Splash -> Unit
+
+                        is State.Permission -> {
+                            LocationPermissionDialog(
+                                onDismissDialog = ::finish,
+                                onClickButton = state.requestPermission
+                            )
                         }
-                    )
+
+                        State.App -> AppScreen()
+                    }
                 }
             }
         }
     }
+}
+
+private sealed class State {
+    object Splash : State()
+    data class Permission(val requestPermission: () -> Unit) : State()
+    object App : State()
+}
+
+@Composable
+private fun Activity.ActivityScreen(content: @Composable (state: State) -> Unit) {
+    var state: State by remember { mutableStateOf(State.Splash) }
+
+    installSplashScreen().setKeepOnScreenCondition {
+        state == State.Splash
+    }
+
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { enabled ->
+            if (enabled) {
+                state = State.App
+            } else {
+                finish()
+            }
+        }
+
+    LaunchedEffect(true) {
+        state = if (hasLocationPermission()) {
+            State.App
+        } else {
+            State.Permission { launcher.launch(Manifest.permission.ACCESS_COARSE_LOCATION) }
+        }
+    }
+
+    content(state)
 }
