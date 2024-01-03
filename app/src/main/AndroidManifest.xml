@@ -38,13 +38,13 @@
         </activity>
 
         <receiver
-            android:name=".modules.alert.executor.AlertReceiver"
+            android:name=".modules.alert.receiver.AlertReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="com.damiandantas.daylighthabits.EXECUTE_ALERT" />
 
         <activity
-            android:name=".modules.alert.executor.AlertActivity"
+            android:name=".modules.alert.notifier.AlertNotifierActivity"
             android:enabled="true"
             android:exported="true"
             android:permission="com.damiandantas.daylighthabits.EXECUTE_ALERT"

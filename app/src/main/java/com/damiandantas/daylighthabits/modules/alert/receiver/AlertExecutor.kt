@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.modules.alert.executor
+package com.damiandantas.daylighthabits.modules.alert.receiver
 
 import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.modules.alert.schedule.AlertRescheduler

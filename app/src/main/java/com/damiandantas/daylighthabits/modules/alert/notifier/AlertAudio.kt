@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.modules.alert.executor.notifier
+package com.damiandantas.daylighthabits.modules.alert.notifier
 
 import android.content.Context
 import android.media.RingtoneManager

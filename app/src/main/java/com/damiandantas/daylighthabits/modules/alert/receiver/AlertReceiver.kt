@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.modules.alert.executor
+package com.damiandantas.daylighthabits.modules.alert.receiver
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.PendingIntentCompat
 import com.damiandantas.daylighthabits.modules.alert.AlertType
+import com.damiandantas.daylighthabits.modules.alert.notifier.AlertNotifierActivity
 import com.damiandantas.daylighthabits.utils.alertType
 import com.damiandantas.daylighthabits.utils.put
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,7 +26,7 @@ class AlertReceiver : BroadcastReceiver() {
 
         GlobalScope.launch {
             if (executor.execute(type) == AlertExecutor.ShowActivityEvent) {
-                context.startActivity(AlertActivity.intent(context, type))
+                context.startActivity(AlertNotifierActivity.intent(context, type))
             }
         }
     }

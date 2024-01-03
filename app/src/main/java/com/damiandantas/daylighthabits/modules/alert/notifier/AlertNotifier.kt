@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.modules.alert.executor.notifier
+package com.damiandantas.daylighthabits.modules.alert.notifier
 
 import com.damiandantas.daylighthabits.modules.alert.settings.AlertSettingsRepository
 import kotlinx.coroutines.flow.first

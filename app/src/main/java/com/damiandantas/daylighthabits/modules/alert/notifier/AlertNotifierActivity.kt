@@ -1,4 +1,4 @@
-package com.damiandantas.daylighthabits.modules.alert.executor
+package com.damiandantas.daylighthabits.modules.alert.notifier
 
 import android.content.Context
 import android.content.Intent
@@ -19,7 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import com.damiandantas.daylighthabits.R
 import com.damiandantas.daylighthabits.modules.alert.AlertType
-import com.damiandantas.daylighthabits.modules.alert.executor.notifier.AlertNotifier
 import com.damiandantas.daylighthabits.ui.theme.AppTheme
 import com.damiandantas.daylighthabits.utils.alertType
 import com.damiandantas.daylighthabits.utils.put
@@ -28,7 +27,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AlertActivity : ComponentActivity() {
+class AlertNotifierActivity : ComponentActivity() {
     @Inject
     lateinit var notifier: AlertNotifier
 
@@ -68,7 +67,7 @@ class AlertActivity : ComponentActivity() {
 
     companion object {
         fun intent(context: Context, type: AlertType): Intent =
-            Intent(context, AlertActivity::class.java).put(type)
+            Intent(context, AlertNotifierActivity::class.java).put(type)
     }
 }
 
