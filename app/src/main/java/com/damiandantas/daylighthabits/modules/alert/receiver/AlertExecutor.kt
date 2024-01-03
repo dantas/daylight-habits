@@ -12,12 +12,12 @@ class AlertExecutor @Inject constructor(
     private val upcomingForecast: UpcomingForecast,
     private val rescheduler: AlertRescheduler
 ) {
-    object ShowActivityEvent
+    object ShouldTriggerEvent
 
-    suspend fun execute(type: AlertType): ShowActivityEvent? {
+    suspend fun execute(type: AlertType): ShouldTriggerEvent? {
         // TODO: Store time to speed up shouldTriggerAlert
         val show = shouldTriggerAlert(clock.instant(), upcomingForecast.get(), type)
         rescheduler.reschedule()
-        return if (show) ShowActivityEvent else null
+        return if (show) ShouldTriggerEvent else null
     }
 }

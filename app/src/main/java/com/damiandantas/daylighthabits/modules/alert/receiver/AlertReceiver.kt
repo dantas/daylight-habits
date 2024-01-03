@@ -25,7 +25,7 @@ class AlertReceiver : BroadcastReceiver() {
         val type = intent.alertType ?: return // TODO: Track this?
 
         GlobalScope.launch {
-            if (executor.execute(type) == AlertExecutor.ShowActivityEvent) {
+            if (executor.execute(type) == AlertExecutor.ShouldTriggerEvent) {
                 context.startActivity(AlertNotifierActivity.intent(context, type))
             }
         }
