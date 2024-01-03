@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AlertReceiver : BroadcastReceiver() {
+class AlertBroadcastReceiver : BroadcastReceiver() {
     @Inject
     lateinit var executor: AlertExecutor
 
@@ -43,7 +43,7 @@ fun unscheduleAlertIntent(context: Context, type: AlertType): PendingIntent? =
     without worrying about refactoring that changes the enum names
  */
 private fun getPendingIntent(context: Context, type: AlertType, noCreate: Boolean): PendingIntent? {
-    val intent = Intent(context, AlertReceiver::class.java).put(type)
+    val intent = Intent(context, AlertBroadcastReceiver::class.java).put(type)
 
     return PendingIntentCompat.getBroadcast(
         context, 0, intent,

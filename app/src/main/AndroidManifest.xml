@@ -38,7 +38,7 @@
         </activity>
 
         <receiver
-            android:name=".modules.alert.receiver.AlertReceiver"
+            android:name=".modules.alert.receiver.AlertBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="com.damiandantas.daylighthabits.EXECUTE_ALERT" />
