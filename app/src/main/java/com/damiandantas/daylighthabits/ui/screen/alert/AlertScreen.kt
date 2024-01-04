@@ -79,8 +79,8 @@ fun AlertScreen(viewModel: AlertScreenViewModel, showErrorMessage: (String) -> U
 @Preview(showSystemUi = true)
 private fun AlertScreenPreview() {
     val forecast = Forecast(
-        sunrise = ZonedDateTime.now().minusMinutes(8),
-        sunset = ZonedDateTime.now().minusMinutes(15)
+        sunrise = ZonedDateTime.now(),
+        sunset = ZonedDateTime.now().plusHours(8)
     )
 
     var sunriseEnabled by remember { mutableStateOf(true) }
@@ -89,13 +89,13 @@ private fun AlertScreenPreview() {
     val sunriseSchedule = AlertSchedule(
         type = AlertType.SUNRISE,
         noticePeriod = Duration.ofMinutes(8),
-        isEnabled = true
+        isEnabled = sunriseEnabled
     )
 
     val sunsetSchedule = AlertSchedule(
         type = AlertType.SUNSET,
         noticePeriod = Duration.ofMinutes(15),
-        isEnabled = true
+        isEnabled = sunsetEnabled
     )
 
     AppTheme {
@@ -103,16 +103,16 @@ private fun AlertScreenPreview() {
             sunriseState = AlertScreenViewModel.State.Loaded(
                 SunMoment(
                     type = AlertType.SUNRISE,
-                    sunTime = ZonedDateTime.now(),
-                    alertTime = ZonedDateTime.now().minus(sunriseSchedule.noticePeriod),
+                    sunTime = forecast.sunrise,
+                    alertTime = forecast.sunrise.minus(sunriseSchedule.noticePeriod),
                     alertSchedule = sunriseSchedule
                 )
             ),
             sunsetState = AlertScreenViewModel.State.Loaded(
                 SunMoment(
                     type = AlertType.SUNSET,
-                    sunTime = ZonedDateTime.now(),
-                    alertTime = ZonedDateTime.now().minus(sunsetSchedule.noticePeriod),
+                    sunTime = forecast.sunset,
+                    alertTime = forecast.sunset.minus(sunsetSchedule.noticePeriod),
                     alertSchedule = sunsetSchedule
                 )
             ),
