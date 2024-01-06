@@ -77,8 +77,8 @@ private suspend fun FusedLocationProviderClient.requestSingleLocation(): android
         removeCallback = { removeLocationUpdates(listener) }
 
         requestLocationUpdates(
-            LocationRequest.Builder(60_000)
-                .setPriority(Priority.PRIORITY_LOW_POWER)
+            LocationRequest.Builder(16) // Try to ensure the fastest location
+                .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
                 .build(),
             listener,
             Looper.getMainLooper()
