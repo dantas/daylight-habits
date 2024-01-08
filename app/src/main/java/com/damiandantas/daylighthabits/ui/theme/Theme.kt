@@ -79,14 +79,15 @@ private val DarkColors = darkColorScheme(
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
+    useDynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val useDynamicColor =
-        !LocalInspectionMode.current && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val canUseDynamicColor =
+        useDynamicColor && !LocalInspectionMode.current && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
     val colorScheme = when {
-        useDynamicColor && useDarkTheme -> dynamicDarkColorScheme(LocalContext.current)
-        useDynamicColor && !useDarkTheme -> dynamicLightColorScheme(LocalContext.current)
+        canUseDynamicColor && useDarkTheme -> dynamicDarkColorScheme(LocalContext.current)
+        canUseDynamicColor && !useDarkTheme -> dynamicLightColorScheme(LocalContext.current)
         useDarkTheme -> DarkColors
         else -> LightColors
     }
