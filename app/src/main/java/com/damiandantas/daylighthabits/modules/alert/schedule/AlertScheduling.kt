@@ -17,7 +17,7 @@ class AlertScheduler @Inject constructor(
     private val scheduler: SystemAlertScheduler
 ) {
     suspend fun setSchedule(schedule: AlertSchedule) {
-        scheduler.unschedule(schedule.type)
+        scheduler.cancel(schedule.type)
 
         if (schedule.isEnabled) {
             val time = scheduleTime(clock.instant(), upcomingForecast.get(), schedule)

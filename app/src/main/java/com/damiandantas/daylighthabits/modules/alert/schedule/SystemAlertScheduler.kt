@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 interface SystemAlertScheduler {
     suspend fun schedule(type: AlertType, time: ZonedDateTime)
-    suspend fun unschedule(type: AlertType)
+    suspend fun cancel(type: AlertType)
 }
 
 @Module
@@ -41,7 +41,7 @@ private class DeviceSystemAlertScheduler @Inject constructor(
             )
         }
 
-    override suspend fun unschedule(type: AlertType) {
+    override suspend fun cancel(type: AlertType) {
         val pendingIntent = unscheduleAlertIntent(context, type) ?: return
 
         context.alarmManager.cancel(pendingIntent)
