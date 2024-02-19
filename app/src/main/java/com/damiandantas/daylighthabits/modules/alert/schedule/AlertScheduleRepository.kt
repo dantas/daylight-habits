@@ -74,12 +74,9 @@ private class DeviceAlertScheduleRepository @Inject constructor(
                 builder.build()
             }
 
-        return try {
+        return runCatching {
             context.alertScheduleDataStore.updateData(operation)
-            true
-        } catch (_: IOException) {
-            false
-        }
+        }.isSuccess
     }
 
     override suspend fun load(type: AlertType): AlertSchedule? {

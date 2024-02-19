@@ -17,7 +17,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retryWhen
-import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import javax.inject.Inject
@@ -48,15 +47,11 @@ private class DeviceAlertSettingsRepository @Inject constructor(
     }
 
     override suspend fun save(settings: AlertSettings): Boolean =
-        try {
+        runCatching {
             context.alertSettingsDataStore.updateData { proto ->
                 proto.protoFrom(settings)
             }
-
-            true
-        } catch (e: IOException) {
-            false
-        }
+        }.isSuccess
 }
 
 private fun AlertSettingsRepositoryProto.toSettings(): AlertSettings =
