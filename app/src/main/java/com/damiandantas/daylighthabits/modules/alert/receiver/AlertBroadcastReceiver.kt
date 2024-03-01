@@ -26,7 +26,11 @@ class AlertBroadcastReceiver : BroadcastReceiver() {
 
         GlobalScope.launch {
             if (executor.execute(type) == AlertExecutor.ShouldTriggerEvent) {
-                context.startActivity(AlertNotifierActivity.intent(context, type))
+                val activityIntent =
+                    AlertNotifierActivity.intent(context, type)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+                context.startActivity(activityIntent)
             }
         }
     }
