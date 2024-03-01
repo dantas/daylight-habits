@@ -5,7 +5,6 @@ import android.content.Context
 import com.damiandantas.daylighthabits.modules.alert.AlertType
 import com.damiandantas.daylighthabits.modules.alert.receiver.cancelAlertIntent
 import com.damiandantas.daylighthabits.modules.alert.receiver.scheduleAlertIntent
-import com.damiandantas.daylighthabits.modules.alert.receiver.unscheduleAlertIntent
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
