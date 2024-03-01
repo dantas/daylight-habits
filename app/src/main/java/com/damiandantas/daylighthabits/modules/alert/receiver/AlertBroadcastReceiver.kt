@@ -35,7 +35,7 @@ class AlertBroadcastReceiver : BroadcastReceiver() {
 fun scheduleAlertIntent(context: Context, type: AlertType): PendingIntent =
     getPendingIntent(context, type, false)!!
 
-fun unscheduleAlertIntent(context: Context, type: AlertType): PendingIntent? =
+fun cancelAlertIntent(context: Context, type: AlertType): PendingIntent? =
     getPendingIntent(context, type, true)
 
 /*

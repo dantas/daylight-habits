@@ -3,6 +3,7 @@ package com.damiandantas.daylighthabits.modules.alert.schedule
 import android.app.AlarmManager
 import android.content.Context
 import com.damiandantas.daylighthabits.modules.alert.AlertType
+import com.damiandantas.daylighthabits.modules.alert.receiver.cancelAlertIntent
 import com.damiandantas.daylighthabits.modules.alert.receiver.scheduleAlertIntent
 import com.damiandantas.daylighthabits.modules.alert.receiver.unscheduleAlertIntent
 import dagger.Binds
@@ -42,7 +43,7 @@ private class DeviceSystemAlertScheduler @Inject constructor(
         }
 
     override suspend fun cancel(type: AlertType) {
-        val pendingIntent = unscheduleAlertIntent(context, type) ?: return
+        val pendingIntent = cancelAlertIntent(context, type) ?: return
 
         context.alarmManager.cancel(pendingIntent)
     }
